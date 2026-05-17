@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>Tight Lines — Fishing Weather</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,30 +17,29 @@
     --teal:#00C9A7; --teal-2:#7BD4F0; --amber:#F5A623;
     --ink:#F4F6FB; --muted:rgba(244,246,251,0.55); --hairline:rgba(255,255,255,0.06);
   }
-  html,body { margin:0; padding:0; height:100%; background:#07091A; color:var(--ink);
-    font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale; overflow:hidden; }
+  html,body { margin:0; padding:0; width:100%; height:100%; height:100dvh;
+    background:#07091A; color:var(--ink); font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow:hidden; }
   * { box-sizing:border-box; }
-  .tl-hide-scrollbar { scrollbar-width:none; }
+  .tl-hide-scrollbar { scrollbar-width:none; -ms-overflow-style:none; }
   .tl-hide-scrollbar::-webkit-scrollbar { display:none; }
   #app-root *::-webkit-scrollbar { display:none; }
-  #app-root * { scrollbar-width:none; }
+  #app-root * { scrollbar-width:none; -ms-overflow-style:none; }
   body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:
-      radial-gradient(ellipse 60% 40% at 20% 90%,rgba(0,201,167,.06),transparent 60%),
+    background: radial-gradient(ellipse 60% 40% at 20% 90%,rgba(0,201,167,.06),transparent 60%),
       radial-gradient(ellipse 70% 50% at 90% 10%,rgba(123,212,240,.05),transparent 60%),
       linear-gradient(180deg,#060A18,#0A0F1E 50%,#07091A); }
-  #app-root { position:relative; z-index:1; width:100%; height:100%;
+  #app-root { position:relative; z-index:1; width:100%; height:100%; height:100dvh;
     display:flex; align-items:center; justify-content:center; }
-  @keyframes tl-stagger{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes tl-screen-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes tl-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
-  @keyframes tl-pop{from{transform:translateX(-50%) scaleX(0);opacity:0}to{transform:translateX(-50%) scaleX(1);opacity:1}}
-  @keyframes tl-rain{0%{transform:translate(0,-4px);opacity:0}30%{opacity:1}100%{transform:translate(-1px,3px);opacity:0}}
-  @keyframes tl-band-in{from{transform:scaleX(0);opacity:.4}to{transform:scaleX(1);opacity:1}}
-  @keyframes tl-lure-bob{0%,100%{transform:translateY(50px) rotate(-2deg)}50%{transform:translateY(56px) rotate(2deg)}}
-  @keyframes tl-tide-undulate{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-  .tl-tide-undulate{animation:tl-tide-undulate 4s ease-in-out infinite;transform-origin:center bottom;}
+  @keyframes tl-stagger { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes tl-screen-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes tl-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.6)} }
+  @keyframes tl-pop { from{transform:translateX(-50%) scaleX(0);opacity:0} to{transform:translateX(-50%) scaleX(1);opacity:1} }
+  @keyframes tl-rain { 0%{transform:translate(0,-4px);opacity:0} 30%{opacity:1} 100%{transform:translate(-1px,3px);opacity:0} }
+  @keyframes tl-band-in { from{transform:scaleX(0);opacity:.4} to{transform:scaleX(1);opacity:1} }
+  @keyframes tl-lure-bob { 0%,100%{transform:translateY(50px) rotate(-2deg)} 50%{transform:translateY(56px) rotate(2deg)} }
+  @keyframes tl-tide-undulate { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+  .tl-tide-undulate { animation:tl-tide-undulate 4s ease-in-out infinite; transform-origin:center bottom; }
 </style>
 </head>
 <body>
@@ -247,7 +249,7 @@ window.TL_DATA = {
 </script>
 
 <script type="text/babel">
-// ── tweaks-panel ──
+// ── tweaks-panel
 
 // tweaks-panel.jsx
 // Reusable Tweaks shell + form-control helpers.
@@ -818,7 +820,7 @@ Object.assign(window, {
 });
 
 
-// ── components ──
+// ── components
 // Tight Lines — shared components
 // Globals: React, ReactDOM (UMD)
 // Tokens are read from CSS vars on :root: --bg, --bg-2, --teal, --amber, --ink, --muted, --hairline, --glass-bg, --glass-blur
@@ -1350,7 +1352,7 @@ Object.assign(window, {
 });
 
 
-// ── screens ──
+// ── screens
 // Tight Lines — screens (Dashboard, Conditions, Catch, Settings)
 // Depends on components.jsx + data.js loaded globally
 
@@ -1400,7 +1402,7 @@ function MotionTag({ children, top, left, right, bottom, anchor = 'tl', shown })
 // ═════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═════════════════════════════════════════════════════════════
-function Dashboard({ tweaks }) {
+function Dashboard({ tweaks, activeLocation }) {
   const intensity = tweaks.glass;
   const showMotion = tweaks.motionLabels;
   const gaugeVariant = tweaks.gauge;
@@ -1470,9 +1472,9 @@ function Dashboard({ tweaks }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', fontSize: 12, letterSpacing: 0.5 }}>
               <svg width="11" height="11" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2.5" fill="var(--teal)"/><circle cx="6" cy="6" r="5" fill="none" stroke="var(--teal)" strokeOpacity="0.35"/></svg>
-              {D.location.region}
+              {(activeLocation || D.location).region}
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, marginTop: 2, letterSpacing: -0.5 }}>{D.location.name}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, marginTop: 2, letterSpacing: -0.5 }}>{(activeLocation || D.location).name}</div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 11, color: 'var(--muted)', letterSpacing: 0.5, lineHeight: 1.4 }}>
             MON 18 MAY<br/>
@@ -1508,7 +1510,7 @@ function Dashboard({ tweaks }) {
         <SectionHeader title="Hourly outlook" hint="Bite score / hour" />
         <div ref={hourlyRef} onScroll={onHourlyScroll}
              style={{ overflowX: 'auto', overflowY: 'hidden', padding: '0 18px 8px',
-                      scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+                      overflowX: 'scroll', WebkitOverflowScrolling: 'touch', msOverflowStyle: 'none' }}
              className="tl-hide-scrollbar">
           <div style={{ display: 'flex', gap: 10 }}>
             {D.hourly.map((h, i) => (
@@ -1658,7 +1660,6 @@ function HourCard({ h, idx, scroll, intensity }) {
   const tone = h.score >= 75 ? 'var(--teal)' : h.score >= 55 ? '#7BD4F0' : 'var(--muted)';
   return (
     <div style={{
-      scrollSnapAlign: 'start',
       transform: `translateX(${parallax}px) translateZ(0) scale(${depth})`,
       transition: 'transform 80ms linear',
       opacity: depth,
@@ -1925,121 +1926,70 @@ function SmallStat({ label, value, tone }) {
 Object.assign(window, { Dashboard, Conditions, MotionTag, StaggerList, SectionHeader, SubTitle, ScreenTitle, TileIcon });
 
 
-// ── screens2 ──
-// Tight Lines — Catch Forecast + Settings screens
+// ── screens2
 
 // ═════════════════════════════════════════════════════════════
-// CATCH FORECAST (priority screen)
+// CATCH FORECAST
 // ═════════════════════════════════════════════════════════════
 function Catch({ tweaks }) {
   const intensity = tweaks.glass;
-  const showMotion = tweaks.motionLabels;
   const [activeId, setActiveId] = React.useState('snapper');
   const species = window.TL_DATA.species;
   const active = species.find(s => s.id === activeId) || species[0];
-
   return (
     <div style={{ height: '100%', overflowY: 'auto', paddingTop: 56, paddingBottom: 100, color: 'var(--ink)' }}>
       <div style={{ padding: '8px 18px 0' }}>
         <ScreenTitle eyebrow="Catch Forecast" title="Bite windows · 24h" />
-
-        {/* Species selector chip row */}
-        <div style={{ position: 'relative', margin: '0 -18px' }}>
-          <div className="tl-hide-scrollbar" style={{ overflowX: 'auto', padding: '4px 18px 12px' }}>
+        <div style={{ margin: '0 -18px' }}>
+          <div className="tl-hide-scrollbar" style={{ overflowX: 'scroll', WebkitOverflowScrolling: 'touch', padding: '4px 18px 12px' }}>
             <div style={{ display: 'flex', gap: 8 }}>
               {species.map(s => (
                 <SpeciesChip key={s.id} sp={s} active={s.id === activeId} onClick={() => setActiveId(s.id)} />
               ))}
             </div>
           </div>
-          <MotionTag shown={showMotion} top={-2} right={6}>
-            Chip active: fish icon<br/>
-            morphs · ring fades in<br/>
-            220ms · ease-out
-          </MotionTag>
         </div>
-
-        {/* Active species card */}
-        <TLGlass intensity={intensity} padding={18} style={{ position: 'relative', marginTop: 4 }}>
+        <TLGlass intensity={intensity} padding={18} style={{ marginTop: 4 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: 0.5, fontStyle: 'italic' }}>
-                {active.maori}
-              </div>
-              <h2 style={{ margin: '2px 0 0', fontSize: 24, letterSpacing: -0.6, fontWeight: 700 }}>
-                {active.name}
-              </h2>
+              <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: 0.5, fontStyle: 'italic' }}>{active.maori}</div>
+              <h2 style={{ margin: '2px 0 0', fontSize: 24, letterSpacing: -0.6, fontWeight: 700 }}>{active.name}</h2>
               <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
                 <StatPill>{active.depthRange}</StatPill>
-                <StatPill tone={active.conf === 'High' ? 'teal' : 'amber'}>
-                  {active.conf} conf.
-                </StatPill>
+                <StatPill tone={active.conf === 'High' ? 'teal' : 'amber'}>{active.conf} conf.</StatPill>
               </div>
             </div>
-            {/* Big species score */}
             <ScoreBubble score={active.score} />
           </div>
-
-          {/* Bite timeline */}
-          <div style={{ marginTop: 22, position: 'relative' }}>
+          <div style={{ marginTop: 22 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-              <span style={{ fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--muted)' }}>
-                Bite timeline
-              </span>
+              <span style={{ fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--muted)' }}>Bite timeline</span>
               <span style={{ fontSize: 10, color: 'var(--muted)' }}>00 · 06 · 12 · 18 · 24</span>
             </div>
             <BiteTimeline windows={active.windows} nowHour={9.25} />
-            <MotionTag shown={showMotion} top={20} right={-4}>
-              Bands fade up<br/>
-              left→right wipe<br/>
-              900ms cubic-bezier
-            </MotionTag>
           </div>
-
-          {/* Forecast note */}
-          <div style={{
-            marginTop: 16, padding: '10px 12px',
-            background: 'rgba(0,201,167,0.06)',
-            border: '1px solid rgba(0,201,167,0.18)',
-            borderRadius: 12,
-            fontSize: 12, lineHeight: 1.45, color: 'rgba(255,255,255,0.85)',
-          }}>
+          <div style={{ marginTop: 16, padding: '10px 12px', background: 'rgba(0,201,167,0.06)', border: '1px solid rgba(0,201,167,0.18)', borderRadius: 12, fontSize: 12, lineHeight: 1.45, color: 'rgba(255,255,255,0.85)' }}>
             <span style={{ color: 'var(--teal)', fontWeight: 700, marginRight: 6 }}>◆</span>
             {active.note}
           </div>
-
-          {/* Window cards */}
           <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>
-              Today's peak windows
-            </div>
+            <div style={{ fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>Today's peak windows</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {active.windows.filter(w => w.level === 'hot').map((w, i) => (
-                <PeakWindow key={i} window={w} />
-              ))}
+              {active.windows.filter(w => w.level === 'hot').map((w, i) => <PeakWindow key={i} window={w} />)}
               {active.windows.filter(w => w.level === 'hot').length === 0 && (
-                <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', padding: '6px 0' }}>
-                  No peak windows today — consider rescheduling or fishing deeper structure.
-                </div>
+                <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', padding: '6px 0' }}>No peak windows today — consider rescheduling.</div>
               )}
             </div>
           </div>
         </TLGlass>
-
-        {/* All species mini-rankings */}
         <div style={{ marginTop: 24 }}>
           <SectionHeader title="Other species" hint="Tap to switch" inset />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
-            {species.filter(s => s.id !== activeId).map(s => (
-              <SpeciesRow key={s.id} sp={s} onClick={() => setActiveId(s.id)} intensity={intensity} />
-            ))}
+            {species.filter(s => s.id !== activeId).map(s => <SpeciesRow key={s.id} sp={s} onClick={() => setActiveId(s.id)} intensity={intensity} />)}
           </div>
         </div>
-
-        {/* Methodology note */}
         <div style={{ marginTop: 22, fontSize: 10, color: 'rgba(255,255,255,0.3)', lineHeight: 1.6, padding: '0 4px' }}>
-          Bite scores combine solunar tables, barometric movement, tidal flow,
-          water temp vs species range, and 5y historical catch data. ±15% variance.
+          Bite scores combine solunar tables, barometric movement, tidal flow, water temp vs species range, and 5y historical catch data. ±15% variance.
         </div>
       </div>
     </div>
@@ -2047,28 +1997,18 @@ function Catch({ tweaks }) {
 }
 
 function SpeciesChip({ sp, active, onClick }) {
-  const ring = active ? 'var(--teal)' : 'rgba(255,255,255,0.08)';
-  const bg = active ? 'rgba(0,201,167,0.13)' : 'rgba(255,255,255,0.03)';
   return (
     <button onClick={onClick} style={{
-      flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
-      padding: '8px 12px 8px 10px',
-      background: bg, border: `1px solid ${ring}`,
-      borderRadius: 999, cursor: 'pointer', color: 'inherit',
-      transition: 'all .22s ease',
+      flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px 8px 10px',
+      background: active ? 'rgba(0,201,167,0.13)' : 'rgba(255,255,255,0.03)',
+      border: `1px solid ${active ? 'var(--teal)' : 'rgba(255,255,255,0.08)'}`,
+      borderRadius: 999, cursor: 'pointer', color: 'inherit', transition: 'all .22s ease',
       transform: active ? 'translateY(-1px)' : 'none',
-      boxShadow: active ? '0 4px 12px -4px rgba(0,201,167,0.5)' : 'none',
-      fontFamily: 'Inter, system-ui',
+      boxShadow: active ? '0 4px 12px -4px rgba(0,201,167,0.5)' : 'none', fontFamily: 'Inter, system-ui',
     }}>
       <FishIcon id={sp.id} width={28} color={active ? 'var(--teal)' : 'rgba(255,255,255,0.55)'} active={active}/>
-      <span style={{ fontSize: 12, fontWeight: 600, color: active ? 'var(--ink)' : 'var(--muted)' }}>
-        {sp.name}
-      </span>
-      <span style={{
-        fontSize: 10, fontWeight: 700,
-        color: active ? 'var(--teal)' : 'rgba(255,255,255,0.4)',
-        fontVariantNumeric: 'tabular-nums',
-      }}>{sp.score}</span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: active ? 'var(--ink)' : 'var(--muted)' }}>{sp.name}</span>
+      <span style={{ fontSize: 10, fontWeight: 700, color: active ? 'var(--teal)' : 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums' }}>{sp.score}</span>
     </button>
   );
 }
@@ -2076,19 +2016,9 @@ function SpeciesChip({ sp, active, onClick }) {
 function ScoreBubble({ score }) {
   const tone = score >= 80 ? 'var(--teal)' : score >= 60 ? '#7BD4F0' : 'var(--amber)';
   return (
-    <div style={{
-      width: 70, height: 70, borderRadius: 999, position: 'relative',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 60%)',
-      border: `1.5px solid ${tone}`,
-      boxShadow: `0 0 18px ${tone}55, inset 0 0 14px rgba(255,255,255,0.04)`,
-      flexShrink: 0,
-    }}>
+    <div style={{ width: 70, height: 70, borderRadius: 999, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 60%)', border: `1.5px solid ${tone}`, boxShadow: `0 0 18px ${tone}55, inset 0 0 14px rgba(255,255,255,0.04)` }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontFamily: '"Inter Tight",Inter', fontSize: 26, fontWeight: 700, color: tone,
-                      letterSpacing: -1, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          {score}
-        </div>
+        <div style={{ fontFamily: '"Inter Tight",Inter', fontSize: 26, fontWeight: 700, color: tone, letterSpacing: -1, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{score}</div>
         <div style={{ fontSize: 8, color: 'var(--muted)', letterSpacing: 1, marginTop: 2 }}>SCORE</div>
       </div>
     </div>
@@ -2097,70 +2027,29 @@ function ScoreBubble({ score }) {
 
 function BiteTimeline({ windows, nowHour = 9.25 }) {
   const colors = {
-    hot:  { bg: 'linear-gradient(180deg, rgba(0,201,167,0.85), rgba(0,201,167,0.45))', glow: 'rgba(0,201,167,0.55)', label: 'HOT' },
-    warm: { bg: 'linear-gradient(180deg, rgba(123,212,240,0.7), rgba(123,212,240,0.35))', glow: 'rgba(123,212,240,0.4)', label: 'WARM' },
-    slow: { bg: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))', glow: 'transparent', label: 'SLOW' },
+    hot:  { bg: 'linear-gradient(180deg,rgba(0,201,167,0.85),rgba(0,201,167,0.45))', glow: 'rgba(0,201,167,0.55)', label: 'HOT' },
+    warm: { bg: 'linear-gradient(180deg,rgba(123,212,240,0.7),rgba(123,212,240,0.35))', glow: 'rgba(123,212,240,0.4)', label: 'WARM' },
+    slow: { bg: 'linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))', glow: 'transparent', label: 'SLOW' },
   };
   return (
-    <div style={{ position: 'relative' }}>
-      {/* timeline track */}
-      <div style={{
-        position: 'relative', height: 56,
-        background: 'rgba(255,255,255,0.03)', borderRadius: 10,
-        overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)',
-      }}>
-        {/* hour ticks */}
-        {[0,6,12,18,24].map(h => (
-          <div key={h} style={{ position: 'absolute', top: 0, bottom: 0, left: `${(h/24)*100}%`,
-                                 width: 1, background: 'rgba(255,255,255,0.06)' }} />
-        ))}
-        {/* bands */}
+    <div>
+      <div style={{ position: 'relative', height: 56, background: 'rgba(255,255,255,0.03)', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        {[0,6,12,18,24].map(h => <div key={h} style={{ position: 'absolute', top: 0, bottom: 0, left: `${(h/24)*100}%`, width: 1, background: 'rgba(255,255,255,0.06)' }} />)}
         {windows.map((w, i) => {
           const c = colors[w.level] || colors.slow;
-          const left = (w.start / 24) * 100;
-          const width = ((w.end - w.start) / 24) * 100;
-          return (
-            <div key={i} style={{
-              position: 'absolute', left: `${left}%`, width: `${width}%`,
-              top: 8, bottom: 8, borderRadius: 4,
-              background: c.bg,
-              boxShadow: `0 0 12px ${c.glow}`,
-              animation: `tl-band-in .9s cubic-bezier(.21,.61,.35,1) ${i * 0.06}s both`,
-              transformOrigin: 'left center',
-            }} />
-          );
+          return <div key={i} style={{ position: 'absolute', left: `${(w.start/24)*100}%`, width: `${((w.end-w.start)/24)*100}%`, top: 8, bottom: 8, borderRadius: 4, background: c.bg, boxShadow: `0 0 12px ${c.glow}`, animation: `tl-band-in .9s cubic-bezier(.21,.61,.35,1) ${i*0.06}s both`, transformOrigin: 'left center' }} />;
         })}
-        {/* NOW indicator */}
-        <div style={{
-          position: 'absolute', top: -4, bottom: -4, left: `${(nowHour/24)*100}%`,
-          width: 2, background: 'var(--amber)',
-          boxShadow: '0 0 12px var(--amber)',
-        }}>
-          <div style={{
-            position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
-            background: 'var(--amber)', color: 'var(--bg)',
-            fontSize: 8, fontWeight: 800, padding: '2px 5px', borderRadius: 3,
-            letterSpacing: 0.5,
-          }}>NOW</div>
+        <div style={{ position: 'absolute', top: -4, bottom: -4, left: `${(nowHour/24)*100}%`, width: 2, background: 'var(--amber)', boxShadow: '0 0 12px var(--amber)' }}>
+          <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'var(--amber)', color: 'var(--bg)', fontSize: 8, fontWeight: 800, padding: '2px 5px', borderRadius: 3, letterSpacing: 0.5 }}>NOW</div>
         </div>
       </div>
-      {/* axis */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4,
-                    fontSize: 9, color: 'var(--muted)', letterSpacing: 0.5,
-                    fontFamily: 'JetBrains Mono, monospace' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 9, color: 'var(--muted)', letterSpacing: 0.5, fontFamily: 'JetBrains Mono, monospace' }}>
         <span>00</span><span>06</span><span>12</span><span>18</span><span>24</span>
       </div>
-      {/* legend */}
       <div style={{ display: 'flex', gap: 14, marginTop: 8, justifyContent: 'center' }}>
         {['hot','warm','slow'].map(k => {
           const c = colors[k];
-          return (
-            <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 2, background: c.bg,
-                             boxShadow: `0 0 4px ${c.glow}` }} />
-              <span style={{ fontSize: 9, color: 'var(--muted)', letterSpacing: 1 }}>{c.label}</span>
-            </div>
-          );
+          return <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: c.bg, boxShadow: `0 0 4px ${c.glow}` }} /><span style={{ fontSize: 9, color: 'var(--muted)', letterSpacing: 1 }}>{c.label}</span></div>;
         })}
       </div>
     </div>
@@ -2168,137 +2057,210 @@ function BiteTimeline({ windows, nowHour = 9.25 }) {
 }
 
 function PeakWindow({ window: w }) {
-  const fmt = (h) => {
-    const hr = Math.floor(h);
-    const mn = Math.round((h - hr) * 60);
-    return `${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
-  };
+  const fmt = h => `${String(Math.floor(h)).padStart(2,'0')}:${String(Math.round((h-Math.floor(h))*60)).padStart(2,'0')}`;
   const dur = w.end - w.start;
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 10,
-      padding: '8px 12px', borderRadius: 10,
-      background: 'rgba(0,201,167,0.06)',
-      border: '1px solid rgba(0,201,167,0.18)',
-    }}>
-      <span style={{ width: 6, height: 32, background: 'var(--teal)', borderRadius: 3,
-                     boxShadow: '0 0 6px var(--teal)' }}/>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 10, background: 'rgba(0,201,167,0.06)', border: '1px solid rgba(0,201,167,0.18)' }}>
+      <span style={{ width: 6, height: 32, background: 'var(--teal)', borderRadius: 3, boxShadow: '0 0 6px var(--teal)', flexShrink: 0 }}/>
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: '"Inter Tight",Inter', fontWeight: 700, fontSize: 16, letterSpacing: -0.3 }}>
-          {fmt(w.start)} – {fmt(w.end)}
-        </div>
-        <div style={{ fontSize: 10, color: 'var(--muted)' }}>
-          {Math.round(dur * 60)} min · solunar major
-        </div>
+        <div style={{ fontFamily: '"Inter Tight",Inter', fontWeight: 700, fontSize: 16, letterSpacing: -0.3 }}>{fmt(w.start)} – {fmt(w.end)}</div>
+        <div style={{ fontSize: 10, color: 'var(--muted)' }}>{Math.round(dur*60)} min · solunar major</div>
       </div>
-      <button style={{
-        background: 'rgba(0,201,167,0.15)', border: '1px solid rgba(0,201,167,0.4)',
-        color: 'var(--teal)', fontSize: 10, fontWeight: 700,
-        padding: '5px 10px', borderRadius: 999, letterSpacing: 0.8,
-        cursor: 'pointer', textTransform: 'uppercase',
-      }}>Remind</button>
+      <button style={{ background: 'rgba(0,201,167,0.15)', border: '1px solid rgba(0,201,167,0.4)', color: 'var(--teal)', fontSize: 10, fontWeight: 700, padding: '5px 10px', borderRadius: 999, letterSpacing: 0.8, cursor: 'pointer', textTransform: 'uppercase' }}>Remind</button>
     </div>
   );
 }
 
-function SpeciesRow({ sp, onClick, intensity }) {
+function SpeciesRow({ sp, onClick }) {
   const tone = sp.score >= 75 ? 'var(--teal)' : sp.score >= 60 ? '#7BD4F0' : 'var(--amber)';
   return (
-    <button onClick={onClick} style={{
-      display: 'grid', gridTemplateColumns: '40px 1fr auto auto', gap: 10, alignItems: 'center',
-      width: '100%', padding: '10px 12px',
-      background: 'rgba(255,255,255,0.025)',
-      border: '1px solid rgba(255,255,255,0.05)',
-      borderRadius: 12, cursor: 'pointer', color: 'inherit',
-      textAlign: 'left', fontFamily: 'Inter, system-ui',
-    }}>
+    <button onClick={onClick} style={{ display: 'grid', gridTemplateColumns: '40px 1fr auto auto', gap: 10, alignItems: 'center', width: '100%', padding: '10px 12px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, cursor: 'pointer', color: 'inherit', textAlign: 'left', fontFamily: 'Inter, system-ui' }}>
       <FishIcon id={sp.id} width={36} color="rgba(255,255,255,0.55)" />
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 600 }}>{sp.name}</div>
-        <div style={{ fontSize: 10, color: 'var(--muted)' }}>{sp.maori}</div>
-      </div>
+      <div><div style={{ fontSize: 13, fontWeight: 600 }}>{sp.name}</div><div style={{ fontSize: 10, color: 'var(--muted)' }}>{sp.maori}</div></div>
       <div style={{ display: 'flex', gap: 1.5, alignItems: 'flex-end' }}>
-        {sp.windows.slice(0, 10).map((w, i) => {
-          const c = w.level === 'hot' ? 'var(--teal)' : w.level === 'warm' ? '#7BD4F0' : 'rgba(255,255,255,0.15)';
-          return <span key={i} style={{ width: 3, height: w.level === 'hot' ? 18 : w.level === 'warm' ? 12 : 6, background: c, borderRadius: 1, boxShadow: w.level !== 'slow' ? `0 0 3px ${c}` : 'none' }}/>;
-        })}
+        {sp.windows.slice(0,10).map((w,i) => { const c = w.level==='hot'?'var(--teal)':w.level==='warm'?'#7BD4F0':'rgba(255,255,255,0.15)'; return <span key={i} style={{ width:3, height:w.level==='hot'?18:w.level==='warm'?12:6, background:c, borderRadius:1, boxShadow:w.level!=='slow'?`0 0 3px ${c}`:'none' }}/>; })}
       </div>
-      <span style={{
-        minWidth: 30, textAlign: 'center', padding: '4px 8px', borderRadius: 6,
-        background: tone === 'var(--teal)' ? 'rgba(0,201,167,0.13)' : tone === '#7BD4F0' ? 'rgba(123,212,240,0.13)' : 'rgba(245,166,35,0.13)',
-        color: tone, fontWeight: 700, fontSize: 12, fontVariantNumeric: 'tabular-nums',
-      }}>{sp.score}</span>
+      <span style={{ minWidth:30, textAlign:'center', padding:'4px 8px', borderRadius:6, background:tone==='var(--teal)'?'rgba(0,201,167,0.13)':tone==='#7BD4F0'?'rgba(123,212,240,0.13)':'rgba(245,166,35,0.13)', color:tone, fontWeight:700, fontSize:12, fontVariantNumeric:'tabular-nums' }}>{sp.score}</span>
     </button>
   );
 }
 
 // ═════════════════════════════════════════════════════════════
-// SETTINGS / LOCATION
+// SETTINGS — geolocation, search autocomplete, interactive prefs
 // ═════════════════════════════════════════════════════════════
-function Settings({ tweaks }) {
+const PREF_OPTIONS = {
+  'Units':         ['Metric · kt · °C', 'Imperial · mph · °F'],
+  'Time format':   ['24-hour', '12-hour'],
+  'Tide datum':    ['LAT (Lowest Astron.)', 'MSL (Mean Sea Level)'],
+  'Notifications': ['2 active', 'All off', 'Critical only'],
+  'Watch face':    ['Score + tide', 'Wind + swell', 'Full dashboard'],
+};
+
+function Settings({ tweaks, onLocationSelect, activeLocation }) {
   const intensity = tweaks.glass;
-  const [q, setQ] = React.useState('');
   const D = window.TL_DATA;
+
+  const [q, setQ]               = React.useState('');
+  const [suggestions, setSugg]  = React.useState([]);
+  const [searching, setSearching]= React.useState(false);
+  const [locating, setLocating] = React.useState(false);
+  const [locError, setLocError] = React.useState('');
+  const [activeIdx, setActiveIdx]= React.useState(0);
+  const [prefs, setPrefs]       = React.useState({
+    'Units': 'Metric · kt · °C', 'Time format': '24-hour',
+    'Tide datum': 'LAT (Lowest Astron.)', 'Notifications': '2 active', 'Watch face': 'Score + tide',
+  });
+  const searchTimer = React.useRef(null);
+
+  // Debounced Nominatim search
+  const handleSearch = val => {
+    setQ(val);
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    if (val.length < 2) { setSugg([]); return; }
+    setSearching(true);
+    searchTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&addressdetails=1`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        const data = await res.json();
+        setSugg(data.slice(0,5).map(d => ({
+          name: d.name || d.display_name.split(',')[0].trim(),
+          region: d.display_name.split(',').slice(1,3).join(', ').trim(),
+          lat: parseFloat(d.lat), lng: parseFloat(d.lon),
+          score: Math.floor(55 + Math.random()*40),
+        })));
+      } catch(e) { setSugg([]); }
+      setSearching(false);
+    }, 420);
+  };
+
+  // Geolocation
+  const detectLocation = () => {
+    if (!navigator.geolocation) { setLocError('Geolocation not supported by your browser'); return; }
+    setLocating(true); setLocError('');
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } });
+          const d = await res.json();
+          const name = d.name || d.address?.suburb || d.address?.city || d.address?.town || 'Current Location';
+          const region = [d.address?.state, d.address?.country].filter(Boolean).join(', ');
+          selectLoc({ name, region, lat, lng, score: 80 });
+        } catch(e) {
+          selectLoc({ name: 'Current Location', region: `${Math.abs(lat).toFixed(3)}°${lat<0?'S':'N'}, ${Math.abs(lng).toFixed(3)}°${lng>0?'E':'W'}`, lat, lng, score: 80 });
+        }
+        setLocating(false);
+      },
+      err => { setLocError(err.code === 1 ? 'Location access denied — check browser permissions' : 'Could not determine location'); setLocating(false); },
+      { timeout: 12000, maximumAge: 120000 }
+    );
+  };
+
+  const selectLoc = loc => { setQ(''); setSugg([]); setActiveIdx(null); onLocationSelect(loc); };
+  const selectRecent = i => { setActiveIdx(i); onLocationSelect(D.recentLocations[i]); };
+  const cyclePref = label => {
+    const opts = PREF_OPTIONS[label];
+    setPrefs(p => ({ ...p, [label]: opts[(opts.indexOf(p[label]) + 1) % opts.length] }));
+  };
+
+  const isActiveRecent = (loc, i) => activeIdx === i || (activeIdx == null && activeLocation && activeLocation.name === loc.name);
+  const showSugg = suggestions.length > 0;
+
   return (
     <div style={{ height: '100%', overflowY: 'auto', paddingTop: 56, paddingBottom: 100, color: 'var(--ink)' }}>
       <div style={{ padding: '8px 18px 0' }}>
         <ScreenTitle eyebrow="Settings" title="Spots & preferences" />
 
-        {/* Search */}
-        <div style={{
-          position: 'relative', marginBottom: 14,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 14, padding: '10px 14px',
-          display: 'flex', alignItems: 'center', gap: 10,
-        }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="7" cy="7" r="5" stroke="var(--muted)" strokeWidth="1.5"/>
-            <path d="M11 11l3 3" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search a spot or coordinates"
-                 style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                          color: 'var(--ink)', fontSize: 14, fontFamily: 'inherit' }}/>
-          <span style={{ fontSize: 9, padding: '2px 6px', background: 'rgba(255,255,255,0.06)',
-                         color: 'var(--muted)', borderRadius: 4, fontFamily: 'JetBrains Mono, monospace' }}>⌘K</span>
+        {/* ── Search with autocomplete ── */}
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: showSugg ? '14px 14px 0 0' : 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            {searching
+              ? <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: 'tl-pulse 1.2s infinite', flexShrink:0 }}><circle cx="8" cy="8" r="5.5" stroke="var(--teal)" strokeWidth="1.5" strokeDasharray="18 8"/></svg>
+              : <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink:0 }}><circle cx="7" cy="7" r="5" stroke="var(--muted)" strokeWidth="1.5"/><path d="M11 11l3 3" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            }
+            <input value={q} onChange={e => handleSearch(e.target.value)}
+                   placeholder="Search a fishing spot…"
+                   style={{ flex:1, background:'transparent', border:'none', outline:'none', color:'var(--ink)', fontSize:14, fontFamily:'inherit' }}/>
+            {q.length > 0 && (
+              <button onClick={() => { setQ(''); setSugg([]); }}
+                      style={{ background:'none', border:'none', cursor:'pointer', color:'var(--muted)', fontSize:18, padding:'0 2px', lineHeight:1 }}>×</button>
+            )}
+          </div>
+          {showSugg && (
+            <div style={{ background:'rgba(10,15,30,0.97)', border:'1px solid rgba(255,255,255,0.08)', borderTop:'none', borderRadius:'0 0 14px 14px', overflow:'hidden' }}>
+              {suggestions.map((s, i) => (
+                <button key={i} onClick={() => selectLoc(s)} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:'11px 14px', background:'transparent', border:'none', borderTop: i>0?'1px solid rgba(255,255,255,0.05)':'none', cursor:'pointer', color:'inherit', textAlign:'left', fontFamily:'inherit', transition:'background .15s' }}
+                        onMouseEnter={e => e.currentTarget.style.background='rgba(0,201,167,0.06)'}
+                        onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                  <svg width="12" height="14" viewBox="0 0 12 14" fill="none" style={{ flexShrink:0 }}>
+                    <path d="M6 1C3.8 1 2 2.8 2 5c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" stroke="var(--teal)" strokeWidth="1.2" fill="rgba(0,201,167,0.18)"/>
+                    <circle cx="6" cy="5" r="1.5" fill="var(--teal)"/>
+                  </svg>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:600, color:'var(--ink)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.name}</div>
+                    <div style={{ fontSize:10, color:'var(--muted)', marginTop:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.region}</div>
+                  </div>
+                  <span style={{ fontSize:10, fontWeight:700, color:'var(--teal)', fontVariantNumeric:'tabular-nums', flexShrink:0 }}>{s.score}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Map fragment */}
-        <TLGlass intensity={intensity} padding={0} style={{ overflow: 'hidden', marginBottom: 16 }}>
+        {/* ── Detect my location ── */}
+        <button onClick={detectLocation} disabled={locating} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'11px 14px', marginBottom:14, background:'rgba(0,201,167,0.08)', border:'1px solid rgba(0,201,167,0.22)', borderRadius:12, cursor:locating?'default':'pointer', color:locating?'var(--muted)':'var(--teal)', fontSize:13, fontWeight:600, fontFamily:'inherit', transition:'all .2s' }}>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="2.8" stroke="currentColor" strokeWidth="1.5"/>
+            <circle cx="8" cy="8" r="6.2" stroke="currentColor" strokeWidth="1" strokeOpacity="0.35"/>
+            <path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          {locating ? 'Detecting…' : 'Use my current location'}
+        </button>
+        {locError && (
+          <div style={{ marginBottom:12, padding:'8px 12px', background:'rgba(255,100,100,0.1)', border:'1px solid rgba(255,100,100,0.25)', borderRadius:10, fontSize:12, color:'#FF9090' }}>{locError}</div>
+        )}
+
+        {/* ── Active spot map ── */}
+        <TLGlass intensity={intensity} padding={0} style={{ overflow:'hidden', marginBottom:16 }}>
           <DarkMap />
-          <div style={{ padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding:'12px 14px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: -0.2 }}>{D.location.name}</div>
-              <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
-                35.18°S · 174.33°E
+              <div style={{ fontSize:12, fontWeight:600 }}>{activeLocation ? activeLocation.name : D.location.name}</div>
+              <div style={{ fontSize:10, color:'var(--muted)', fontFamily:'JetBrains Mono, monospace', marginTop:2 }}>
+                {activeLocation && activeLocation.lat
+                  ? `${Math.abs(activeLocation.lat).toFixed(2)}°${activeLocation.lat<0?'S':'N'} · ${Math.abs(activeLocation.lng).toFixed(2)}°${activeLocation.lng>0?'E':'W'}`
+                  : '35.18°S · 174.33°E'}
               </div>
             </div>
             <StatPill tone="teal">Active</StatPill>
           </div>
         </TLGlass>
 
-        {/* Recent locations */}
+        {/* ── Recent spots ── */}
         <SectionHeader title="Recent spots" hint="Tap to switch" inset />
-        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ marginTop:8, display:'flex', flexDirection:'column', gap:6 }}>
           {D.recentLocations.map((loc, i) => (
-            <LocationRow key={i} loc={loc} active={i === 0} />
+            <LocationRow key={i} loc={loc} active={isActiveRecent(loc, i)} onSelect={() => selectRecent(i)} />
           ))}
         </div>
 
-        {/* Preferences */}
-        <div style={{ marginTop: 22 }}>
-          <SectionHeader title="Preferences" hint="" inset />
-          <TLGlass intensity={intensity} padding={0} style={{ marginTop: 8 }}>
-            <PrefRow label="Units" value="Metric · kt · °C" />
-            <PrefRow label="Time format" value="24-hour" />
-            <PrefRow label="Tide datum" value="LAT (Lowest Astron.)" />
-            <PrefRow label="Notifications" value="2 active" tone="teal" />
-            <PrefRow label="Watch face" value="Score + tide" last />
+        {/* ── Preferences ── */}
+        <div style={{ marginTop:22 }}>
+          <SectionHeader title="Preferences" hint="Tap to change" inset />
+          <TLGlass intensity={intensity} padding={0} style={{ marginTop:8 }}>
+            {Object.entries(prefs).map(([label, value], i, arr) => (
+              <PrefRow key={label} label={label} value={value}
+                       tone={label==='Notifications'?'teal':undefined}
+                       last={i===arr.length-1}
+                       onTap={() => cyclePref(label)} />
+            ))}
           </TLGlass>
         </div>
 
-        {/* Footer */}
-        <div style={{ padding: '24px 0 8px', textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.25)', letterSpacing: 1.5 }}>
+        <div style={{ padding:'24px 0 8px', textAlign:'center', fontSize:10, color:'rgba(255,255,255,0.25)', letterSpacing:1.5 }}>
           TIGHT LINES · v2.4 · MADE IN AOTEAROA
         </div>
       </div>
@@ -2307,273 +2269,132 @@ function Settings({ tweaks }) {
 }
 
 function DarkMap() {
-  // Stylised dark map fragment — land mass (Bay of Islands)
   return (
-    <div style={{ position: 'relative', height: 180, background: '#070C19', overflow: 'hidden' }}>
+    <div style={{ position:'relative', height:180, background:'#070C19', overflow:'hidden' }}>
       <svg width="100%" height="100%" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid slice">
         <defs>
           <pattern id="tl-map-grid" width="36" height="36" patternUnits="userSpaceOnUse">
             <path d="M36 0H0V36" fill="none" stroke="rgba(0,201,167,0.06)" strokeWidth="0.5"/>
           </pattern>
           <radialGradient id="tl-map-vignette" cx="50%" cy="50%" r="60%">
-            <stop offset="0%" stopColor="rgba(0,201,167,0.1)"/>
-            <stop offset="100%" stopColor="rgba(0,0,0,0)"/>
+            <stop offset="0%" stopColor="rgba(0,201,167,0.1)"/><stop offset="100%" stopColor="rgba(0,0,0,0)"/>
           </radialGradient>
         </defs>
         <rect width="400" height="180" fill="url(#tl-map-grid)"/>
         <rect width="400" height="180" fill="url(#tl-map-vignette)"/>
-        {/* land */}
-        <path d="M-10 100 Q 50 80, 110 90 Q 160 100, 200 70 Q 260 50, 310 80 Q 350 100, 410 70 L 410 -10 L -10 -10 Z"
-              fill="rgba(255,255,255,0.04)" stroke="rgba(0,201,167,0.25)" strokeWidth="0.8"/>
-        <path d="M30 130 Q 50 110, 70 130 Q 90 145, 80 160 Q 60 175, 40 165 Q 20 155, 30 130 Z"
-              fill="rgba(255,255,255,0.05)" stroke="rgba(0,201,167,0.18)" strokeWidth="0.6"/>
-        <path d="M150 140 Q 165 135, 175 145 Q 175 158, 160 162 Q 145 155, 150 140 Z"
-              fill="rgba(255,255,255,0.05)" stroke="rgba(0,201,167,0.18)" strokeWidth="0.6"/>
-        {/* depth contours */}
-        <path d="M0 130 Q 80 140, 160 130 T 320 135 T 400 130" fill="none" stroke="rgba(0,201,167,0.15)" strokeWidth="0.5" strokeDasharray="3 4"/>
-        <path d="M0 155 Q 80 165, 160 155 T 320 160 T 400 155" fill="none" stroke="rgba(0,201,167,0.1)" strokeWidth="0.5" strokeDasharray="3 4"/>
-        {/* compass */}
-        <g transform="translate(360, 28)">
+        <path d="M-10 100 Q 50 80,110 90 Q 160 100,200 70 Q 260 50,310 80 Q 350 100,410 70 L 410 -10 L -10 -10 Z" fill="rgba(255,255,255,0.04)" stroke="rgba(0,201,167,0.25)" strokeWidth="0.8"/>
+        <path d="M30 130 Q 50 110,70 130 Q 90 145,80 160 Q 60 175,40 165 Q 20 155,30 130 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(0,201,167,0.18)" strokeWidth="0.6"/>
+        <path d="M0 130 Q 80 140,160 130 T 320 135 T 400 130" fill="none" stroke="rgba(0,201,167,0.15)" strokeWidth="0.5" strokeDasharray="3 4"/>
+        <g transform="translate(360,28)">
           <circle r="14" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
           <path d="M0 -10 L 3 0 L 0 10 L -3 0 Z" fill="var(--amber)"/>
           <text y="-16" textAnchor="middle" fontSize="7" fill="var(--amber)" fontFamily="Inter">N</text>
         </g>
-        {/* marker */}
-        <g transform="translate(220, 130)">
-          <circle r="18" fill="rgba(245,166,35,0.18)">
-            <animate attributeName="r" values="18;26;18" dur="2.4s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2.4s" repeatCount="indefinite"/>
-          </circle>
-          <circle r="6" fill="var(--amber)" stroke="white" strokeWidth="1.5"
-                  style={{ filter: 'drop-shadow(0 0 6px var(--amber))' }}/>
+        <g transform="translate(220,130)">
+          <circle r="18" fill="rgba(245,166,35,0.18)"><animate attributeName="r" values="18;26;18" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2.4s" repeatCount="indefinite"/></circle>
+          <circle r="6" fill="var(--amber)" stroke="white" strokeWidth="1.5" style={{ filter:'drop-shadow(0 0 6px var(--amber))' }}/>
         </g>
-        {/* scale bar */}
-        <g transform="translate(16, 158)">
+        <g transform="translate(16,158)">
           <rect width="40" height="2" fill="rgba(255,255,255,0.4)"/>
-          <text y="-4" fontSize="7" fill="rgba(255,255,255,0.5)" fontFamily="JetBrains Mono, monospace">2 NM</text>
+          <text y="-4" fontSize="7" fill="rgba(255,255,255,0.5)" fontFamily="JetBrains Mono,monospace">2 NM</text>
         </g>
       </svg>
     </div>
   );
 }
 
-function LocationRow({ loc, active }) {
+function LocationRow({ loc, active, onSelect }) {
   const tone = loc.score >= 75 ? 'var(--teal)' : loc.score >= 60 ? '#7BD4F0' : 'var(--amber)';
   return (
-    <button style={{
-      display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-      padding: '10px 12px',
-      background: active ? 'rgba(0,201,167,0.06)' : 'rgba(255,255,255,0.025)',
-      border: active ? '1px solid rgba(0,201,167,0.25)' : '1px solid rgba(255,255,255,0.05)',
-      borderRadius: 12, color: 'inherit', textAlign: 'left', cursor: 'pointer',
-      fontFamily: 'Inter, system-ui',
-    }}>
-      <div style={{
-        width: 28, height: 28, borderRadius: 8,
-        background: 'rgba(255,255,255,0.04)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        {loc.favourite ? (
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--amber)">
-            <path d="M8 1l2 4.5 5 .6-3.7 3.4 1 5L8 12l-4.3 2.5 1-5L1 6.1l5-.6L8 1z"/>
-          </svg>
-        ) : (
-          <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
-            <path d="M6 1C3.8 1 2 2.8 2 5c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" stroke="var(--muted)" strokeWidth="1"/>
-            <circle cx="6" cy="5" r="1.5" fill="var(--muted)"/>
-          </svg>
-        )}
+    <button onClick={onSelect} style={{ display:'flex', alignItems:'center', gap:10, width:'100%', padding:'10px 12px', background:active?'rgba(0,201,167,0.06)':'rgba(255,255,255,0.025)', border:active?'1px solid rgba(0,201,167,0.28)':'1px solid rgba(255,255,255,0.05)', borderRadius:12, color:'inherit', textAlign:'left', cursor:'pointer', fontFamily:'Inter,system-ui', transition:'all .2s ease' }}>
+      <div style={{ width:28, height:28, borderRadius:8, background:'rgba(255,255,255,0.04)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid rgba(255,255,255,0.06)', flexShrink:0 }}>
+        {loc.favourite
+          ? <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--amber)"><path d="M8 1l2 4.5 5 .6-3.7 3.4 1 5L8 12l-4.3 2.5 1-5L1 6.1l5-.6L8 1z"/></svg>
+          : <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M6 1C3.8 1 2 2.8 2 5c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" stroke="var(--muted)" strokeWidth="1"/><circle cx="6" cy="5" r="1.5" fill="var(--muted)"/></svg>
+        }
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 600 }}>{loc.name}</div>
-        <div style={{ fontSize: 10, color: 'var(--muted)' }}>{loc.region}</div>
+      <div style={{ flex:1 }}>
+        <div style={{ fontSize:13, fontWeight:600 }}>{loc.name}</div>
+        <div style={{ fontSize:10, color:'var(--muted)' }}>{loc.region}</div>
       </div>
-      <span style={{
-        padding: '3px 7px', borderRadius: 6, fontSize: 11, fontWeight: 700,
-        color: tone, background: tone === 'var(--teal)' ? 'rgba(0,201,167,0.13)' : tone === '#7BD4F0' ? 'rgba(123,212,240,0.13)' : 'rgba(245,166,35,0.13)',
-      }}>{loc.score}</span>
+      <span style={{ padding:'3px 7px', borderRadius:6, fontSize:11, fontWeight:700, color:tone, background:tone==='var(--teal)'?'rgba(0,201,167,0.13)':tone==='#7BD4F0'?'rgba(123,212,240,0.13)':'rgba(245,166,35,0.13)', flexShrink:0 }}>{loc.score}</span>
     </button>
   );
 }
 
-function PrefRow({ label, value, tone, last }) {
+function PrefRow({ label, value, tone, last, onTap }) {
   return (
-    <div style={{
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '14px 16px', borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.04)',
-    }}>
-      <span style={{ fontSize: 13, color: 'var(--ink)' }}>{label}</span>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12,
-                     color: tone === 'teal' ? 'var(--teal)' : 'var(--muted)' }}>
+    <button onClick={onTap} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', padding:'14px 16px', background:'transparent', border:'none', borderBottom:last?'none':'1px solid rgba(255,255,255,0.04)', cursor:'pointer', color:'inherit', fontFamily:'inherit', textAlign:'left', transition:'background .15s' }}
+            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.02)'}
+            onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+      <span style={{ fontSize:13, color:'var(--ink)' }}>{label}</span>
+      <span style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, color:tone==='teal'?'var(--teal)':'var(--muted)' }}>
         {value}
         <svg width="6" height="10" viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" stroke="var(--muted)" strokeWidth="1.4" fill="none" strokeLinecap="round"/></svg>
       </span>
-    </div>
+    </button>
   );
 }
 
 Object.assign(window, { Catch, Settings });
 
 
-// ── app ──
-// Tight Lines — main App: routing, bottom nav, tweaks panel
+// ── app
 
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "glass": "frosted",
-  "mode": "night",
-  "gauge": "arc",
-  "motionLabels": false
-}/*EDITMODE-END*/;
+const TWEAK_DEFAULTS = { "glass":"frosted","mode":"night","gauge":"arc","motionLabels":false };
 
 function App() {
   const [screen, setScreen] = React.useState('dashboard');
-  const [tweaks, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+  const [tweaks, setTweak]  = window.useTweaks(TWEAK_DEFAULTS);
+  const [activeLocation, setActiveLocation] = React.useState(window.TL_DATA.location);
 
-  // apply day/night CSS variables
   React.useEffect(() => {
     const root = document.documentElement;
     if (tweaks.mode === 'predawn') {
       root.style.setProperty('--bg',  '#1A1320');
       root.style.setProperty('--bg-2','#2A1B2C');
-      root.style.setProperty('--bg-grad', 'radial-gradient(ellipse 100% 50% at 50% 0%, #3A2235, #1A1320 70%)');
+      root.style.setProperty('--bg-grad','radial-gradient(ellipse 100% 50% at 50% 0%,#3A2235,#1A1320 70%)');
     } else {
       root.style.setProperty('--bg',  '#0A0F1E');
       root.style.setProperty('--bg-2','#101830');
-      root.style.setProperty('--bg-grad', 'radial-gradient(ellipse 100% 60% at 50% -10%, #102540, #0A0F1E 70%)');
+      root.style.setProperty('--bg-grad','radial-gradient(ellipse 100% 60% at 50% -10%,#102540,#0A0F1E 70%)');
     }
   }, [tweaks.mode]);
 
   const screens = {
-    dashboard: <Dashboard tweaks={tweaks} />,
+    dashboard:  <Dashboard tweaks={tweaks} activeLocation={activeLocation} />,
     conditions: <Conditions tweaks={tweaks} />,
-    catch: <Catch tweaks={tweaks} />,
-    settings: <Settings tweaks={tweaks} />,
+    catch:      <Catch tweaks={tweaks} />,
+    settings:   <Settings tweaks={tweaks} onLocationSelect={setActiveLocation} activeLocation={activeLocation} />,
   };
 
   return (
-    <div style={{
-      width: '100%', height: '100%', position: 'relative',
-      background: 'var(--bg-grad), var(--bg)',
-      backgroundBlendMode: 'normal',
-      fontFamily: 'Inter, system-ui, sans-serif',
-      color: 'var(--ink)',
-      overflow: 'hidden',
-    }}>
-      <div key={screen} style={{
-        position: 'absolute', inset: 0,
-        animation: 'tl-screen-in .4s cubic-bezier(.21,.61,.35,1)',
-      }}>
+    <div style={{ width:'100%', height:'100%', position:'relative', background:'var(--bg-grad),var(--bg)', fontFamily:'Inter,system-ui,sans-serif', color:'var(--ink)', overflow:'hidden' }}>
+      <div key={screen} style={{ position:'absolute', inset:0, animation:'tl-screen-in .4s cubic-bezier(.21,.61,.35,1)' }}>
         {screens[screen]}
       </div>
       <BottomNav active={screen} onChange={setScreen} />
-
-      <window.TweaksPanel title="Tweaks" defaultPosition={{ right: 20, bottom: 100 }}>
-        <window.TweakSection label="Surface">
-          <window.TweakRadio
-            label="Glass"
-            value={tweaks.glass}
-            onChange={v => setTweak('glass', v)}
-            options={[{ value: 'frosted', label: 'Frosted' }, { value: 'flat', label: 'Flat' }]}
-          />
-        </window.TweakSection>
-        <window.TweakSection label="Mode">
-          <window.TweakRadio
-            label="Theme"
-            value={tweaks.mode}
-            onChange={v => setTweak('mode', v)}
-            options={[{ value: 'night', label: 'Deep navy' }, { value: 'predawn', label: 'Predawn' }]}
-          />
-        </window.TweakSection>
-        <window.TweakSection label="Gauge">
-          <window.TweakRadio
-            label="Style"
-            value={tweaks.gauge}
-            onChange={v => setTweak('gauge', v)}
-            options={[
-              { value: 'arc', label: 'Arc' },
-              { value: 'liquid', label: 'Liquid' },
-              { value: 'segmented', label: 'Segments' },
-            ]}
-          />
-        </window.TweakSection>
-        <window.TweakSection label="Annotations">
-          <window.TweakToggle
-            label="Motion specs overlay"
-            value={tweaks.motionLabels}
-            onChange={v => setTweak('motionLabels', v)}
-          />
-        </window.TweakSection>
-        <div style={{ marginTop: 10, fontSize: 10, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
-          Style guide:&nbsp;
-          <a href="style-guide.html" target="_blank" style={{ color: 'var(--teal)' }}>open ↗</a>
-        </div>
-      </window.TweaksPanel>
     </div>
   );
 }
 
-function ScreenTransition({ children, screenKey }) {
-  return (
-    <div key={screenKey} style={{
-      position: 'absolute', inset: 0,
-      animation: 'tl-screen-in .4s cubic-bezier(.21,.61,.35,1)',
-    }}>
-      {children}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Bottom Nav — icon morphs + label fade on active state
-// ─────────────────────────────────────────────────────────────
 function BottomNav({ active, onChange }) {
   const items = [
-    { id: 'dashboard',  label: 'Today',      icon: NavHomeIcon },
-    { id: 'conditions', label: 'Conditions', icon: NavConditionsIcon },
-    { id: 'catch',      label: 'Catch',      icon: NavCatchIcon },
-    { id: 'settings',   label: 'Spots',      icon: NavSpotsIcon },
+    { id:'dashboard',  label:'Today',      icon:NavHomeIcon },
+    { id:'conditions', label:'Conditions', icon:NavConditionsIcon },
+    { id:'catch',      label:'Catch',      icon:NavCatchIcon },
+    { id:'settings',   label:'Spots',      icon:NavSpotsIcon },
   ];
   return (
-    <div style={{
-      position: 'absolute', left: 12, right: 12, bottom: 18, zIndex: 50,
-      borderRadius: 24,
-      background: 'rgba(10,15,30,0.65)',
-      backdropFilter: 'blur(22px) saturate(160%)',
-      WebkitBackdropFilter: 'blur(22px) saturate(160%)',
-      border: '1px solid rgba(255,255,255,0.08)',
-      boxShadow: '0 16px 40px -16px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)',
-      padding: '8px 8px',
-      display: 'flex', gap: 2,
-    }}>
+    <div style={{ position:'absolute', left:12, right:12, bottom:'max(18px,env(safe-area-inset-bottom,18px))', zIndex:50, borderRadius:24, background:'rgba(10,15,30,0.65)', backdropFilter:'blur(22px) saturate(160%)', WebkitBackdropFilter:'blur(22px) saturate(160%)', border:'1px solid rgba(255,255,255,0.08)', boxShadow:'0 16px 40px -16px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.06)', padding:'8px 8px', display:'flex', gap:2 }}>
       {items.map(it => {
         const on = active === it.id;
         const Icon = it.icon;
         return (
-          <button key={it.id} onClick={() => onChange(it.id)} style={{
-            flex: 1, background: 'transparent', border: 'none', cursor: 'pointer',
-            padding: '8px 4px',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-            color: on ? 'var(--teal)' : 'rgba(255,255,255,0.55)',
-            position: 'relative',
-            fontFamily: 'Inter, system-ui',
-          }}>
-            {on && (
-              <span style={{
-                position: 'absolute', top: 3, left: '50%', transform: 'translateX(-50%)',
-                width: 24, height: 3, borderRadius: 2,
-                background: 'var(--teal)',
-                boxShadow: '0 0 8px var(--teal)',
-                animation: 'tl-pop .35s cubic-bezier(.34,1.56,.64,1)',
-              }}/>
-            )}
-            <Icon active={on} />
-            <span style={{
-              fontSize: 9.5, letterSpacing: 0.5, fontWeight: on ? 700 : 500,
-              opacity: on ? 1 : 0.75,
-              transform: on ? 'translateY(0)' : 'translateY(1px)',
-              transition: 'all .25s ease',
-            }}>{it.label}</span>
+          <button key={it.id} onClick={() => onChange(it.id)} style={{ flex:1, background:'transparent', border:'none', cursor:'pointer', padding:'8px 4px', display:'flex', flexDirection:'column', alignItems:'center', gap:4, color:on?'var(--teal)':'rgba(255,255,255,0.55)', position:'relative', fontFamily:'Inter,system-ui' }}>
+            {on && <span style={{ position:'absolute', top:3, left:'50%', transform:'translateX(-50%)', width:24, height:3, borderRadius:2, background:'var(--teal)', boxShadow:'0 0 8px var(--teal)', animation:'tl-pop .35s cubic-bezier(.34,1.56,.64,1)' }}/>}
+            <Icon active={on}/>
+            <span style={{ fontSize:9.5, letterSpacing:0.5, fontWeight:on?700:500, opacity:on?1:0.75, transform:on?'translateY(0)':'translateY(1px)', transition:'all .25s ease' }}>{it.label}</span>
           </button>
         );
       })}
@@ -2581,67 +2402,52 @@ function BottomNav({ active, onChange }) {
   );
 }
 
-// Bottom nav icons — morph slightly when active (stroke→fill)
 function NavHomeIcon({ active }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <path d="M3 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H4a1 1 0 0 1-1-1v-8z"
-            stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"
-            fill={active ? 'currentColor' : 'transparent'}
-            fillOpacity={active ? 0.18 : 0}
-            style={{ transition: 'fill-opacity .25s ease' }}/>
-    </svg>
-  );
+  return <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H4a1 1 0 0 1-1-1v-8z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" fill={active?'currentColor':'transparent'} fillOpacity={active?0.18:0} style={{ transition:'fill-opacity .25s ease' }}/></svg>;
 }
 function NavConditionsIcon({ active }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <circle cx="11" cy="9" r="3" stroke="currentColor" strokeWidth="1.6"
-              fill={active ? 'currentColor' : 'transparent'} fillOpacity={active ? 0.2 : 0}/>
-      <path d="M3 16c2 -2 4 -2 6 0s4 2 6 0s2 0 2 0M3 19c2 -2 4 -2 6 0s4 2 6 0s2 0 2 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
-    </svg>
-  );
+  return <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="9" r="3" stroke="currentColor" strokeWidth="1.6" fill={active?'currentColor':'transparent'} fillOpacity={active?0.2:0}/><path d="M3 16c2-2 4-2 6 0s4 2 6 0s2 0 2 0M3 19c2-2 4-2 6 0s4 2 6 0s2 0 2 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none"/></svg>;
 }
 function NavCatchIcon({ active }) {
-  return (
-    <svg width="26" height="22" viewBox="0 0 26 22" fill={active ? 'currentColor' : 'none'}>
-      <path d="M2 11 Q 7 5, 18 6 Q 22 7, 24 11 Q 22 15, 18 16 Q 7 17, 2 11 L 0 7 L 3 11 L 0 15 Z"
-            stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"
-            fillOpacity={active ? 0.18 : 0}/>
-      <circle cx="19" cy="10" r="0.9" fill={active ? 'var(--bg)' : 'currentColor'}/>
-    </svg>
-  );
+  return <svg width="26" height="22" viewBox="0 0 26 22" fill={active?'currentColor':'none'}><path d="M2 11 Q 7 5,18 6 Q 22 7,24 11 Q 22 15,18 16 Q 7 17,2 11 L 0 7 L 3 11 L 0 15 Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" fillOpacity={active?0.18:0}/><circle cx="19" cy="10" r="0.9" fill={active?'var(--bg)':'currentColor'}/></svg>;
 }
 function NavSpotsIcon({ active }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <path d="M11 2C7.7 2 5 4.7 5 8c0 4.5 6 11 6 11s6-6.5 6-11c0-3.3-2.7-6-6-6z"
-            stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"
-            fill={active ? 'currentColor' : 'transparent'} fillOpacity={active ? 0.18 : 0}/>
-      <circle cx="11" cy="8" r="2.4" stroke="currentColor" strokeWidth="1.6" fill={active ? 'var(--bg)' : 'transparent'}/>
-    </svg>
-  );
+  return <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2C7.7 2 5 4.7 5 8c0 4.5 6 11 6 11s6-6.5 6-11c0-3.3-2.7-6-6-6z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" fill={active?'currentColor':'transparent'} fillOpacity={active?0.18:0}/><circle cx="11" cy="8" r="2.4" stroke="currentColor" strokeWidth="1.6" fill={active?'var(--bg)':'transparent'}/></svg>;
 }
 
 window.App = App;
 
 
+// ── mount
 
-// ── Mount ──────────────────────────────────────────────────
 function Root() {
-  const [scale, setScale] = React.useState(1);
+  const getVP = () => {
+    const vvp = window.visualViewport;
+    return { w: vvp ? vvp.width : window.innerWidth, h: vvp ? vvp.height : window.innerHeight };
+  };
+  const [dims, setDims] = React.useState(getVP);
   React.useEffect(() => {
-    const fit = () => {
-      const sx = window.innerWidth / 402;
-      const sy = window.innerHeight / 874;
-      setScale(Math.min(sx, sy));
+    const upd = () => setDims(getVP());
+    window.addEventListener('resize', upd);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', upd);
+    return () => {
+      window.removeEventListener('resize', upd);
+      if (window.visualViewport) window.visualViewport.removeEventListener('resize', upd);
     };
-    fit();
-    window.addEventListener('resize', fit);
-    return () => window.removeEventListener('resize', fit);
   }, []);
+
+  // On narrow screens fill the screen; on desktop scale the 402×874 layout
+  const isMobile = dims.w <= 540;
+  if (isMobile) {
+    return (
+      <div style={{ width: dims.w, height: dims.h, position: 'relative', overflow: 'hidden', background: '#0A0F1E' }}>
+        <App/>
+      </div>
+    );
+  }
+  const scale = Math.min(dims.w / 402, dims.h / 874);
   return (
-    <div style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}>
+    <div style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}>
       <div style={{ width: 402, height: 874, position: 'relative', overflow: 'hidden', background: '#0A0F1E' }}>
         <App/>
       </div>
