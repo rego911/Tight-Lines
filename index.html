@@ -1721,7 +1721,7 @@ function StatTilesGrid({ n, intensity, showMotion }) {
     { icon: 'wave',    label: 'Swell',     value: `${n.waveHeight}`, unit: 'm', sub: `${n.swellPeriod}s ${n.swellDir}`, tone: 'default' },
     { icon: 'water',   label: 'Water',     value: `${n.waterTemp}`,  unit: '°C', sub: `Air ${n.airTemp}°`, tone: 'default' },
     { icon: 'tide',    label: 'Tide',      value: `${n.tideHeight}`, unit: 'm', sub: `${n.nextTide}`, tone: 'teal' },
-    { icon: 'baro',    label: 'Pressure',  value: `${n.barometric}`, unit: 'hPa', sub: null, tone: 'default', pressure: true },
+    { icon: 'baro',    label: 'Pressure',  value: `${n.barometric}`, unit: 'hPa', sub: null, tone: 'default', pressure: true, trend: n.barometricTrend, delta: n.barometricDelta },
     { icon: 'uv',      label: 'UV',        value: `${n.uv}`,         unit: n.uvLabel, sub: 'Peak 13:20', tone: 'amber' },
   ];
   return (
@@ -1736,7 +1736,7 @@ function StatTilesGrid({ n, intensity, showMotion }) {
   );
 }
 
-function StatTile({ icon, label, value, unit, sub, tone = 'default', intensity, idx, pressure }) {
+function StatTile({ icon, label, value, unit, sub, tone = 'default', intensity, idx, pressure, trend, delta }) {
   const toneColor = tone === 'teal' ? 'var(--teal)' : tone === 'amber' ? 'var(--amber)' : 'var(--ink)';
   return (
     <TLGlass intensity={intensity} padding={10} style={{ minHeight: 88 }}>
@@ -1754,7 +1754,7 @@ function StatTile({ icon, label, value, unit, sub, tone = 'default', intensity, 
       </div>
       {pressure ? (
         <div style={{ marginTop: 4 }}>
-          <PressureArrow trend={D.now.barometricTrend} delta={D.now.barometricDelta} />
+          <PressureArrow trend={trend} delta={delta} />
         </div>
       ) : sub ? (
         <div style={{ marginTop: 4, fontSize: 10, color: 'var(--muted)' }}>{sub}</div>
