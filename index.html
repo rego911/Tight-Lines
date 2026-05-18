@@ -1357,7 +1357,134 @@ Object.assign(window, {
 // Depends on components.jsx + data.js loaded globally
 
 const { useState: useStateS, useEffect: useEffectS, useRef: useRefS, useMemo: useMemoS } = React;
-const D = window.TL_DATA;
+const LocationDataCtx = React.createContext(window.TL_DATA);
+
+// ── generateLocationData: produce varied-but-consistent mock data
+//    seeded deterministically from lat/lng so each location looks different.
+function generateLocationData(loc) {
+  const lat = loc.lat != null ? loc.lat : -35.18;
+  const lng = loc.lng != null ? loc.lng : 174.33;
+  // deterministic pseudo-random: h(n) → 0..1
+  const h = n => { let x = Math.sin(lat * 127.1 + lng * 311.7 + n * 74.3) * 43758.5453; return x - Math.floor(x); };
+  const pad = n => String(Math.floor(n)).padStart(2, '0');
+  const fmt = (hh, mm) => `${pad(hh % 24)}:${pad(((mm % 60) + 60) % 60)}`;
+
+  const dirs16 = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  const dirs8  = ['N','NE','E','SE','S','SW','W','NW'];
+  const phases = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+  const trends = ['rising','falling','steady'];
+  const conds  = ['clear','partly','cloud','partly','clear','rain'];
+  const peaks  = ['05:45 — 09:00','06:00 — 09:30','06:30 — 08:00','17:30 — 20:00','18:00 — 20:30'];
+
+  const score      = Math.round(35 + h(1) * 55);
+  const windSpeed  = Math.round(5 + h(2) * 22);
+  const windDir    = Math.round(h(4) * 360);
+  const windDirLabel = dirs16[Math.round(h(4) * 15)];
+  const waveHeight = +((0.4 + h(5) * 2.8).toFixed(1));
+  const swellPeriod = Math.round(5 + h(6) * 10);
+  const swellDir   = dirs8[Math.floor(h(7) * 8)];
+  const waterTemp  = +((12 + h(8) * 10).toFixed(1));
+  const airTemp    = Math.round(11 + h(9) * 12);
+  const barometric = Math.round(1000 + h(10) * 30);
+  const baro_trend = trends[Math.floor(h(11) * 3)];
+  const baroDelta  = +((h(12) * 6 - 3).toFixed(1));
+  const uvRaw      = Math.round(1 + h(13) * 10);
+  const uvLabel    = uvRaw <= 2 ? 'Low' : uvRaw <= 5 ? 'Moderate' : uvRaw <= 7 ? 'High' : uvRaw <= 9 ? 'Very High' : 'Extreme';
+  const moonIllum  = +(h(16).toFixed(2));
+  const moonPhase  = phases[Math.floor(h(16) * 8) % 8];
+
+  // Tide times — semi-diurnal (4 tides spread across 24h)
+  const baseH = Math.floor(h(20) * 12);
+  const baseM = Math.floor(h(21) * 60);
+  const addMin = (bh, bm, mins) => { const t = bh * 60 + bm + Math.round(mins); return { hh: Math.floor(t / 60) % 24, mm: t % 60 }; };
+  const t_h1 = { hh: baseH, mm: baseM };
+  const t_l1 = addMin(baseH, baseM, 370 + h(22) * 50);
+  const t_h2 = addMin(baseH, baseM, 745 + h(23) * 30);
+  const t_l2 = addMin(baseH, baseM, 1120 + h(24) * 50);
+  const th1 = +(1.5 + h(25) * 0.7).toFixed(2);
+  const tl1 = +(0.08 + h(26) * 0.25).toFixed(2);
+  const th2 = +(1.4 + h(27) * 0.8).toFixed(2);
+  const tl2 = +(0.1 + h(28) * 0.25).toFixed(2);
+  const tideEvents = [
+    { time: fmt(t_h1.hh, t_h1.mm), label: 'High', height: th1 },
+    { time: fmt(t_l1.hh, t_l1.mm), label: 'Low',  height: tl1 },
+    { time: fmt(t_h2.hh, t_h2.mm), label: 'High', height: th2 },
+    { time: fmt(t_l2.hh, t_l2.mm), label: 'Low',  height: tl2 },
+  ].sort((a, b) => a.time.localeCompare(b.time));
+  const tideHeight = +(0.3 + h(15) * 1.7).toFixed(1);
+  const tideState  = h(29) > 0.5 ? 'Rising' : 'Falling';
+  const nextTideEvt = tideState === 'Rising' ? tideEvents.find(e => e.label === 'High') : tideEvents.find(e => e.label === 'Low');
+  const nextTide   = nextTideEvt ? `${nextTideEvt.label} ${nextTideEvt.time}` : 'High 14:32';
+
+  // Sun times
+  const srH = 5 + Math.floor(h(30) * 2);
+  const srM = Math.floor(h(31) * 60);
+  const ssH = 17 + Math.floor(h(32) * 3);
+  const ssM = Math.floor(h(33) * 60);
+
+  const now = {
+    score, windSpeed,
+    windGust: Math.round(windSpeed + 3 + h(3) * 10),
+    windDir, windDirLabel, waveHeight, swellPeriod, swellDir,
+    waterTemp, airTemp, barometric,
+    barometricTrend: baro_trend, barometricDelta: baroDelta,
+    uv: uvRaw, uvLabel, tideState, tideHeight, nextTide,
+    moonPhase, moonIllum,
+    dawn:    fmt(srH - 1 < 0 ? 0 : srH - 1, srM < 30 ? srM + 30 : srM - 30),
+    sunrise: fmt(srH, srM),
+    sunset:  fmt(ssH, ssM),
+    dusk:    fmt(ssH, ssM < 30 ? ssM + 35 : ssM - 25),
+  };
+
+  // Hourly
+  const hourly = Array.from({ length: 24 }, (_, i) => {
+    const hr = (8 + i) % 24;
+    const hs = Math.round(score * 0.55 + 22 * Math.sin((hr / 24) * Math.PI * 2 - 0.5) + (hr >= 5 && hr <= 7 || hr >= 17 && hr <= 19 ? 10 : 0) + h(40 + i) * 14);
+    return {
+      hour: hr,
+      label: i === 0 ? 'Now' : `${String(hr).padStart(2,'0')}:00`,
+      score: Math.max(15, Math.min(98, hs)),
+      temp:  +((airTemp - 2 + h(50 + i) * 5).toFixed(1)),
+      wind:  Math.round(windSpeed * 0.6 + h(60 + i) * windSpeed * 0.6),
+      cond:  conds[Math.floor(h(70 + i) * conds.length)],
+    };
+  });
+
+  // Daily
+  const dNames = ['Today','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dDates = ['Mon 18','Tue 19','Wed 20','Thu 21','Fri 22','Sat 23','Sun 24'];
+  const daily = dNames.map((day, i) => {
+    const ds = i === 0 ? score : Math.round(Math.max(15, Math.min(98, score + h(80 + i) * 40 - 20)));
+    return {
+      day, date: dDates[i],
+      hi: Math.round(airTemp + h(90 + i) * 4 - 1),
+      lo: Math.round(airTemp - 4 + h(95 + i) * 3),
+      score: ds,
+      peakWindow: ds > 60 ? peaks[Math.floor(h(85 + i) * peaks.length)] : '—',
+      cond: conds[Math.floor(h(88 + i) * conds.length)],
+    };
+  });
+
+  // Tide curve
+  const tph = h(29) * Math.PI * 2;
+  const tide = Array.from({ length: 48 }, (_, i) => {
+    const t = i / 48 * 24;
+    const ht = 1.0 + 0.95 * Math.sin((t / 12.42) * Math.PI * 2 + tph);
+    return { t, hour: t, height: +(ht.toFixed(2)) };
+  });
+
+  // Species with varied scores
+  const species = window.TL_DATA.species.map((sp, i) => ({
+    ...sp,
+    score: Math.round(Math.max(20, Math.min(98, sp.score + h(100 + i) * 30 - 15))),
+  }));
+
+  return {
+    location: loc,
+    now, hourly, daily, tide, tideEvents, species,
+    recentLocations: window.TL_DATA.recentLocations,
+  };
+}
 
 // helper: stagger entrance — each child fades & rises with delay
 function StaggerList({ children, gap = 12, delay = 0 }) {
@@ -1403,6 +1530,7 @@ function MotionTag({ children, top, left, right, bottom, anchor = 'tl', shown })
 // DASHBOARD
 // ═════════════════════════════════════════════════════════════
 function Dashboard({ tweaks, activeLocation }) {
+  const D = React.useContext(LocationDataCtx);
   const intensity = tweaks.glass;
   const showMotion = tweaks.motionLabels;
   const gaugeVariant = tweaks.gauge;
@@ -1496,7 +1624,7 @@ function Dashboard({ tweaks, activeLocation }) {
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
           <StatPill tone="teal">↑ {n.tideState}</StatPill>
           <StatPill tone="amber">{n.uvLabel} UV {n.uv}</StatPill>
-          <StatPill>Moon 78%</StatPill>
+          <StatPill>Moon {Math.round(n.moonIllum * 100)}%</StatPill>
         </div>
 
         {/* stat tiles */}
@@ -1739,14 +1867,15 @@ function DailyRow({ d, highlight, last }) {
 // ═════════════════════════════════════════════════════════════
 // CONDITIONS DETAIL
 // ═════════════════════════════════════════════════════════════
-function Conditions({ tweaks }) {
+function Conditions({ tweaks, activeLocation }) {
+  const D = React.useContext(LocationDataCtx);
   const intensity = tweaks.glass;
   const showMotion = tweaks.motionLabels;
   const n = D.now;
   return (
     <div style={{ height: '100%', overflowY: 'auto', paddingTop: 56, paddingBottom: 100, color: 'var(--ink)' }}>
       <div style={{ padding: '8px 18px 0' }}>
-        <ScreenTitle eyebrow="Detailed conditions" title="Now off Cape Brett" />
+        <ScreenTitle eyebrow="Detailed conditions" title={`Now off ${activeLocation ? activeLocation.name : D.location.name}`} />
 
         {/* Wind */}
         <StaggerList>
@@ -1817,7 +1946,7 @@ function Conditions({ tweaks }) {
                 <MoonPhase illum={n.moonIllum} size={56} />
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{n.moonPhase}</div>
-                  <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>78% illum.</div>
+                  <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>{Math.round(n.moonIllum * 100)}% illum.</div>
                 </div>
               </div>
               <div style={{ marginTop: 14, fontSize: 10, color: 'var(--muted)' }}>
@@ -1850,7 +1979,12 @@ function Conditions({ tweaks }) {
               <circle cx="200" cy="6" r="3" fill="var(--teal)"/>
             </svg>
             <div style={{ marginTop: 4, fontSize: 11, color: 'var(--muted)' }}>
-              Rising steadily — classic post-front pattern. Fish typically <span style={{ color: 'var(--teal)' }}>respond well</span> 6–18h after.
+              {n.barometricTrend === 'rising'
+                ? <span>Rising steadily — classic post-front pattern. Fish typically <span style={{ color: 'var(--teal)' }}>respond well</span> 6–18h after.</span>
+                : n.barometricTrend === 'falling'
+                ? <span>Falling — pre-front pressure drop. Fish often <span style={{ color: 'var(--teal)' }}>feed aggressively</span> in the hours just ahead.</span>
+                : <span>Holding steady — stable conditions favour <span style={{ color: 'var(--teal)' }}>consistent fishing</span> throughout the day.</span>
+              }
             </div>
             <MotionTag shown={showMotion} top={14} right={120}>
               Pressure arrow<br/>
@@ -1932,9 +2066,10 @@ Object.assign(window, { Dashboard, Conditions, MotionTag, StaggerList, SectionHe
 // CATCH FORECAST
 // ═════════════════════════════════════════════════════════════
 function Catch({ tweaks }) {
+  const D = React.useContext(LocationDataCtx);
   const intensity = tweaks.glass;
   const [activeId, setActiveId] = React.useState('snapper');
-  const species = window.TL_DATA.species;
+  const species = D.species;
   const active = species.find(s => s.id === activeId) || species[0];
   return (
     <div style={{ height: '100%', overflowY: 'auto', paddingTop: 56, paddingBottom: 100, color: 'var(--ink)' }}>
@@ -2098,7 +2233,7 @@ const PREF_OPTIONS = {
 
 function Settings({ tweaks, onLocationSelect, activeLocation }) {
   const intensity = tweaks.glass;
-  const D = window.TL_DATA;
+  const D = window.TL_DATA; // recentLocations only — weather context not needed here
 
   const [q, setQ]               = React.useState('');
   const [suggestions, setSugg]  = React.useState([]);
@@ -2347,6 +2482,12 @@ function App() {
   const [screen, setScreen] = React.useState('dashboard');
   const [tweaks, setTweak]  = window.useTweaks(TWEAK_DEFAULTS);
   const [activeLocation, setActiveLocation] = React.useState(window.TL_DATA.location);
+  const [locData, setLocData] = React.useState(window.TL_DATA);
+
+  const handleLocationSelect = loc => {
+    setActiveLocation(loc);
+    setLocData(generateLocationData(loc));
+  };
 
   React.useEffect(() => {
     const root = document.documentElement;
@@ -2363,18 +2504,20 @@ function App() {
 
   const screens = {
     dashboard:  <Dashboard tweaks={tweaks} activeLocation={activeLocation} />,
-    conditions: <Conditions tweaks={tweaks} />,
+    conditions: <Conditions tweaks={tweaks} activeLocation={activeLocation} />,
     catch:      <Catch tweaks={tweaks} />,
-    settings:   <Settings tweaks={tweaks} onLocationSelect={setActiveLocation} activeLocation={activeLocation} />,
+    settings:   <Settings tweaks={tweaks} onLocationSelect={handleLocationSelect} activeLocation={activeLocation} />,
   };
 
   return (
-    <div style={{ width:'100%', height:'100%', position:'relative', background:'var(--bg-grad),var(--bg)', fontFamily:'Inter,system-ui,sans-serif', color:'var(--ink)', overflow:'hidden' }}>
-      <div key={screen} style={{ position:'absolute', inset:0, animation:'tl-screen-in .4s cubic-bezier(.21,.61,.35,1)' }}>
-        {screens[screen]}
+    <LocationDataCtx.Provider value={locData}>
+      <div style={{ width:'100%', height:'100%', position:'relative', background:'var(--bg-grad),var(--bg)', fontFamily:'Inter,system-ui,sans-serif', color:'var(--ink)', overflow:'hidden' }}>
+        <div key={screen} style={{ position:'absolute', inset:0, animation:'tl-screen-in .4s cubic-bezier(.21,.61,.35,1)' }}>
+          {screens[screen]}
+        </div>
+        <BottomNav active={screen} onChange={setScreen} />
       </div>
-      <BottomNav active={screen} onChange={setScreen} />
-    </div>
+    </LocationDataCtx.Provider>
   );
 }
 
