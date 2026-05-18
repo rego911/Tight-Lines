@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -1529,13 +1529,38 @@ function MotionTag({ children, top, left, right, bottom, anchor = 'tl', shown })
 // ═════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═════════════════════════════════════════════════════════════
-function Dashboard({ tweaks, activeLocation }) {
+function Dashboard({ tweaks, activeLocation, onLocationSelect, setUserGeoLoc }) {
   const D = React.useContext(LocationDataCtx);
   const intensity = tweaks.glass;
   const showMotion = tweaks.motionLabels;
   const gaugeVariant = tweaks.gauge;
   const n = D.now;
   const scrollRef = useRefS(null);
+
+  // Home-screen geolocation
+  const [geoLoading, setGeoLoading] = useStateS(false);
+  const detectHome = () => {
+    if (!navigator.geolocation || !onLocationSelect) return;
+    setGeoLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        if (setUserGeoLoc) setUserGeoLoc({ lat, lng });
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } });
+          const d = await res.json();
+          const name = d.name || d.address?.suburb || d.address?.city || d.address?.town || 'Current Location';
+          const region = [d.address?.state, d.address?.country].filter(Boolean).join(', ');
+          onLocationSelect({ name, region, lat, lng, score: 80 });
+        } catch(e) {
+          onLocationSelect({ name: 'Current Location', region: `${Math.abs(lat).toFixed(2)}°${lat<0?'S':'N'}`, lat, lng, score: 80 });
+        }
+        setGeoLoading(false);
+      },
+      () => setGeoLoading(false),
+      { timeout: 12000, maximumAge: 120000 }
+    );
+  };
   const [pull, setPull] = useStateS(0); // 0..1 pull-to-refresh state
   const [refreshing, setRefreshing] = useStateS(false);
   const startY = useRefS(null);
@@ -1602,7 +1627,20 @@ function Dashboard({ tweaks, activeLocation }) {
               <svg width="11" height="11" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2.5" fill="var(--teal)"/><circle cx="6" cy="6" r="5" fill="none" stroke="var(--teal)" strokeOpacity="0.35"/></svg>
               {(activeLocation || D.location).region}
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, marginTop: 2, letterSpacing: -0.5 }}>{(activeLocation || D.location).name}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.5 }}>{(activeLocation || D.location).name}</div>
+              <button onClick={detectHome} title="Use current location" style={{
+                background: 'rgba(0,201,167,0.1)', border: '1px solid rgba(0,201,167,0.3)',
+                borderRadius: 999, width: 28, height: 28, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
+                opacity: geoLoading ? 0.5 : 1, transition: 'opacity .2s',
+              }}>
+                {geoLoading
+                  ? <svg width="13" height="13" viewBox="0 0 13 13" style={{ animation: 'tl-pulse 1s infinite' }}><circle cx="6.5" cy="6.5" r="5" fill="none" stroke="var(--teal)" strokeWidth="1.5"/></svg>
+                  : <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2.5" fill="var(--teal)"/><circle cx="7" cy="7" r="5.5" stroke="var(--teal)" strokeWidth="1.2"/><line x1="7" y1="0" x2="7" y2="2" stroke="var(--teal)" strokeWidth="1.2"/><line x1="7" y1="12" x2="7" y2="14" stroke="var(--teal)" strokeWidth="1.2"/><line x1="0" y1="7" x2="2" y2="7" stroke="var(--teal)" strokeWidth="1.2"/><line x1="12" y1="7" x2="14" y2="7" stroke="var(--teal)" strokeWidth="1.2"/></svg>
+                }
+              </button>
+            </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 11, color: 'var(--muted)', letterSpacing: 0.5, lineHeight: 1.4 }}>
             MON 18 MAY<br/>
@@ -2231,7 +2269,7 @@ const PREF_OPTIONS = {
   'Watch face':    ['Score + tide', 'Wind + swell', 'Full dashboard'],
 };
 
-function Settings({ tweaks, onLocationSelect, activeLocation }) {
+function Settings({ tweaks, onLocationSelect, activeLocation, userGeoLoc, setUserGeoLoc }) {
   const intensity = tweaks.glass;
   const D = window.TL_DATA; // recentLocations only — weather context not needed here
 
@@ -2255,8 +2293,13 @@ function Settings({ tweaks, onLocationSelect, activeLocation }) {
     setSearching(true);
     searchTimer.current = setTimeout(async () => {
       try {
+        // Bias results toward user's location; fall back to NZ if unknown
+        const _gl = userGeoLoc;
+        const viewbox = _gl
+          ? `${(_gl.lng-4).toFixed(2)},${(_gl.lat+4).toFixed(2)},${(_gl.lng+4).toFixed(2)},${(_gl.lat-4).toFixed(2)}`
+          : '165.0,-34.0,178.5,-47.5';
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&addressdetails=1`,
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=8&addressdetails=1&viewbox=${viewbox}&bounded=0`,
           { headers: { 'Accept-Language': 'en' } }
         );
         const data = await res.json();
@@ -2278,6 +2321,7 @@ function Settings({ tweaks, onLocationSelect, activeLocation }) {
     navigator.geolocation.getCurrentPosition(
       async pos => {
         const { latitude: lat, longitude: lng } = pos.coords;
+        if (setUserGeoLoc) setUserGeoLoc({ lat, lng });
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } });
           const d = await res.json();
@@ -2483,10 +2527,12 @@ function App() {
   const [tweaks, setTweak]  = window.useTweaks(TWEAK_DEFAULTS);
   const [activeLocation, setActiveLocation] = React.useState(window.TL_DATA.location);
   const [locData, setLocData] = React.useState(window.TL_DATA);
+  const [userGeoLoc, setUserGeoLoc] = React.useState(null);
 
   const handleLocationSelect = loc => {
     setActiveLocation(loc);
     setLocData(generateLocationData(loc));
+    if (loc.lat != null && loc.lng != null) setUserGeoLoc({ lat: loc.lat, lng: loc.lng });
   };
 
   React.useEffect(() => {
@@ -2503,10 +2549,10 @@ function App() {
   }, [tweaks.mode]);
 
   const screens = {
-    dashboard:  <Dashboard tweaks={tweaks} activeLocation={activeLocation} />,
+    dashboard:  <Dashboard tweaks={tweaks} activeLocation={activeLocation} onLocationSelect={handleLocationSelect} setUserGeoLoc={setUserGeoLoc} />,
     conditions: <Conditions tweaks={tweaks} activeLocation={activeLocation} />,
     catch:      <Catch tweaks={tweaks} />,
-    settings:   <Settings tweaks={tweaks} onLocationSelect={handleLocationSelect} activeLocation={activeLocation} />,
+    settings:   <Settings tweaks={tweaks} onLocationSelect={handleLocationSelect} activeLocation={activeLocation} userGeoLoc={userGeoLoc} setUserGeoLoc={setUserGeoLoc} />,
   };
 
   return (
