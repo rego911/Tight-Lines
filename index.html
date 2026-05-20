@@ -2725,6 +2725,40 @@ const PREF_OPTIONS = {
   'Watch face':    ['Score + tide', 'Wind + swell', 'Full dashboard'],
 };
 
+
+function NearbySpotRow({ spot, intensity, onSelect }) {
+  const score = spot.score || 50;
+  const tone = score >= 75 ? 'var(--teal)' : score >= 55 ? '#7BD4F0' : 'var(--amber)';
+  const label = score >= 75 ? 'Hot' : score >= 55 ? 'Good' : 'Fair';
+  const toneAlpha = score >= 75 ? 'rgba(0,201,167,0.1)' : score >= 55 ? 'rgba(123,212,240,0.1)' : 'rgba(245,166,35,0.1)';
+  return (
+    <button onClick={onSelect} style={{
+      width:'100%', display:'flex', alignItems:'center', gap:12,
+      padding:'11px 14px',
+      background:'rgba(255,255,255,0.025)',
+      border:'1px solid rgba(255,255,255,0.06)', borderRadius:12,
+      cursor:'pointer', color:'inherit', textAlign:'left', fontFamily:'Inter,system-ui',
+      transition:'background .18s',
+    }}>
+      <div style={{
+        width:44, height:44, borderRadius:12, flexShrink:0,
+        background:toneAlpha, border:`1px solid ${tone}44`,
+        display:'flex', alignItems:'center', justifyContent:'center',
+      }}>
+        <span style={{ fontFamily:'"Inter Tight",Inter', fontSize:17, fontWeight:700, color:tone, fontVariantNumeric:'tabular-nums' }}>{score}</span>
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontWeight:600, fontSize:14, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{spot.name}</div>
+        {spot.region ? <div style={{ fontSize:11, color:'var(--muted)', marginTop:2 }}>{spot.region}</div> : null}
+      </div>
+      <div style={{ textAlign:'right', flexShrink:0 }}>
+        {spot.distKm != null && <div style={{ fontSize:11, color:'var(--muted)' }}>{spot.distKm < 1 ? '<1' : spot.distKm} km</div>}
+        <div style={{ fontSize:10, color:tone, fontWeight:700, marginTop:2, letterSpacing:0.3 }}>{label}</div>
+      </div>
+    </button>
+  );
+}
+
 function Settings({ tweaks, onLocationSelect, activeLocation, userGeoLoc, setUserGeoLoc }) {
   const intensity = tweaks.glass;
   const D = window.TL_DATA; // recentLocations only — weather context not needed here
@@ -2740,6 +2774,49 @@ function Settings({ tweaks, onLocationSelect, activeLocation, userGeoLoc, setUse
     'Tide datum': 'LAT (Lowest Astron.)', 'Notifications': '2 active', 'Watch face': 'Score + tide',
   });
   const searchTimer = React.useRef(null);
+  const [nearbySpots, setNearbySpots]   = React.useState([]);
+  const [nearbyLoading, setNearbyLoading] = React.useState(false);
+
+  // Fetch real nearby fishing spots from Nominatim when location known
+  const fetchNearbySpots = React.useCallback(async (lat, lng) => {
+    setNearbyLoading(true);
+    const delta = 0.8;
+    const vb = `${(lng-delta).toFixed(3)},${(lat+delta).toFixed(3)},${(lng+delta).toFixed(3)},${(lat-delta).toFixed(3)}`;
+    const hdr = { headers: { 'Accept-Language': 'en' } };
+    const qs = (term) =>
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(term)}&format=json&limit=4&viewbox=${vb}&bounded=1&addressdetails=1`, hdr)
+        .then(r => r.json()).catch(() => []);
+    try {
+      // Stagger requests to respect Nominatim 1req/s policy
+      const bays    = await qs('bay');
+      const wharves = await qs('wharf');
+      const points  = await qs('point');
+      const combined = [...bays, ...wharves, ...points];
+      const seen = new Set();
+      const unique = combined.filter(p => {
+        const key = `${parseFloat(p.lat).toFixed(2)},${parseFloat(p.lon).toFixed(2)}`;
+        if (seen.has(key)) return false;
+        seen.add(key); return true;
+      });
+      const h = (slat, slng, n) => { let x = Math.sin(slat*127.1 + slng*311.7 + n*74.3)*43758.5453; return x-Math.floor(x); };
+      const spots = unique.slice(0, 7).map(p => {
+        const plat = parseFloat(p.lat), plng = parseFloat(p.lon);
+        const dlat = (plat - lat) * 111;
+        const dlng = (plng - lng) * 111 * Math.cos(lat * Math.PI / 180);
+        const distKm = Math.round(Math.sqrt(dlat*dlat + dlng*dlng));
+        const score = Math.round(38 + h(plat, plng, 1) * 57);
+        const name = p.name || p.display_name.split(',')[0].trim();
+        const region = [p.address?.suburb, p.address?.city, p.address?.county, p.address?.state].filter(Boolean)[0] || '';
+        return { name, region, lat: plat, lng: plng, distKm, score };
+      }).sort((a, b) => b.score - a.score);
+      setNearbySpots(spots);
+    } catch(e) { console.warn('Nearby spots error', e); }
+    setNearbyLoading(false);
+  }, []);
+
+  React.useEffect(() => {
+    if (userGeoLoc) fetchNearbySpots(userGeoLoc.lat, userGeoLoc.lng);
+  }, [userGeoLoc, fetchNearbySpots]);
 
   // Debounced Nominatim search
   const handleSearch = val => {
@@ -2873,6 +2950,31 @@ function Settings({ tweaks, onLocationSelect, activeLocation, userGeoLoc, setUse
             <StatPill tone="teal">Active</StatPill>
           </div>
         </TLGlass>
+
+        {/* ── Nearby spots ── */}
+        {(nearbyLoading || nearbySpots.length > 0) && (
+          <div style={{ marginTop:28 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+              <SectionHeader title="Nearby hot spots" hint="Tap to navigate" inset />
+              {nearbyLoading && (
+                <span style={{ fontSize:10, color:'var(--teal)', letterSpacing:0.5 }}>Scanning…</span>
+              )}
+            </div>
+            {nearbyLoading && nearbySpots.length === 0
+              ? <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                  {[0,1,2].map(i => (
+                    <div key={i} style={{ height:68, borderRadius:12, background:'rgba(255,255,255,0.03)', animation:'tl-stagger .8s ease infinite alternate' }}/>
+                  ))}
+                </div>
+              : <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                  {nearbySpots.map((spot, i) => (
+                    <NearbySpotRow key={i} spot={spot} intensity={intensity}
+                      onSelect={() => selectLoc(spot)} />
+                  ))}
+                </div>
+            }
+          </div>
+        )}
 
         {/* ── Recent spots ── */}
         <SectionHeader title="Recent spots" hint="Tap to switch" inset />
