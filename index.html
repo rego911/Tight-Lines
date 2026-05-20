@@ -41,6 +41,76 @@
   @keyframes tl-tide-undulate { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
   .tl-tide-undulate { animation:tl-tide-undulate 4s ease-in-out infinite; transform-origin:center bottom; }
 </style>
+<script>
+(function(){
+  function drawFish(size) {
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    var x = c.getContext('2d');
+    var s = size;
+    // Background
+    x.fillStyle = '#07091A';
+    x.fillRect(0,0,s,s);
+    // Radial glow
+    var g = x.createRadialGradient(s*.56,s*.5,0,s*.56,s*.5,s*.52);
+    g.addColorStop(0,'rgba(0,201,167,0.28)');
+    g.addColorStop(1,'rgba(0,201,167,0)');
+    x.fillStyle = g; x.fillRect(0,0,s,s);
+    var cx=s*.54, cy=s*.5, rx=s*.29, ry=s*.175;
+    // Tail
+    x.beginPath();
+    x.moveTo(cx-rx, cy);
+    x.lineTo(cx-rx-s*.19, cy-s*.19);
+    x.lineTo(cx-rx-s*.05, cy);
+    x.lineTo(cx-rx-s*.19, cy+s*.19);
+    x.closePath();
+    x.fillStyle='#00C9A7'; x.fill();
+    // Body
+    x.beginPath();
+    x.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+    x.fillStyle='#00C9A7'; x.fill();
+    // Dorsal fin
+    x.beginPath();
+    x.moveTo(cx-rx*.3,cy-ry);
+    x.quadraticCurveTo(cx+rx*.1,cy-ry-s*.13,cx+rx*.35,cy-ry+s*.01);
+    x.lineTo(cx+rx*.35,cy-ry);
+    x.closePath();
+    x.fillStyle='rgba(0,180,150,0.85)'; x.fill();
+    // Eye white
+    x.beginPath();
+    x.arc(cx+rx*.55,cy-ry*.18,s*.052,0,Math.PI*2);
+    x.fillStyle='#fff'; x.fill();
+    // Eye pupil
+    x.beginPath();
+    x.arc(cx+rx*.55+s*.012,cy-ry*.18,s*.03,0,Math.PI*2);
+    x.fillStyle='#07091A'; x.fill();
+    // Eye shine
+    x.beginPath();
+    x.arc(cx+rx*.55+s*.005,cy-ry*.18-s*.018,s*.012,0,Math.PI*2);
+    x.fillStyle='rgba(255,255,255,0.9)'; x.fill();
+    // Mouth
+    x.beginPath();
+    x.arc(cx+rx+s*.01,cy+s*.03,s*.035,-.4,Math.PI*.55);
+    x.strokeStyle='#07091A'; x.lineWidth=s*.025; x.stroke();
+    return c.toDataURL('image/png');
+  }
+  // Apple touch icon (180×180)
+  var big = drawFish(180);
+  var al = document.createElement('link');
+  al.rel='apple-touch-icon'; al.sizes='180x180'; al.href=big;
+  document.head.appendChild(al);
+  // Favicon 32
+  var sm = drawFish(32);
+  var fl = document.createElement('link');
+  fl.rel='icon'; fl.type='image/png'; fl.sizes='32x32'; fl.href=sm;
+  document.head.appendChild(fl);
+  // Favicon 16
+  var ti = drawFish(16);
+  var tl = document.createElement('link');
+  tl.rel='icon'; tl.type='image/png'; tl.sizes='16x16'; tl.href=ti;
+  document.head.appendChild(tl);
+})();
+</script>
 </head>
 <body>
 <div id="app-root"></div>
@@ -2409,6 +2479,13 @@ function EmptyCatchLog({ onAdd }) {
 }
 
 function AddCatchSheet({ intensity, activeLocation, onSave, onClose }) {
+  // Lock background scroll while sheet is open
+  React.useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => { document.body.style.overflow = prev; document.body.style.touchAction = ''; };
+  }, []);
   const [species, setSpecies]   = React.useState('snapper');
   const [length,  setLength]    = React.useState('');
   const [weight,  setWeight]    = React.useState('');
@@ -2447,7 +2524,7 @@ function AddCatchSheet({ intensity, activeLocation, onSave, onClose }) {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:200, backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)' }}/>
+      <div onClick={onClose} onTouchMove={e=>e.preventDefault()} onWheel={e=>e.preventDefault()} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:200, backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)', touchAction:'none' }}/>
       <div style={{
         position:'fixed', bottom:0, left:0, right:0, zIndex:201,
         background:'linear-gradient(180deg,#131B2E,#0D1526)',
