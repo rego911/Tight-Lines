@@ -1613,6 +1613,16 @@ function Dashboard({ tweaks, activeLocation, onLocationSelect, setUserGeoLoc, pr
   const scrollRef = useRefS(null);
 
   // Home-screen geolocation
+  // Live clock — ticks every 30s
+  const [clockNow, setClockNow] = useStateS(() => new Date());
+  useEffectS(() => {
+    const id = setInterval(() => setClockNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, []);
+  const _clockDate = clockNow.toLocaleDateString('en-NZ', { weekday:'short', day:'numeric', month:'short' }).toUpperCase().replace(',','');
+  const _clockTime = clockNow.toLocaleTimeString('en-NZ', { hour:'2-digit', minute:'2-digit', hour12: false });
+  const _clockTZ   = clockNow.toLocaleTimeString('en-US', { timeZoneName:'short' }).split(' ').pop();
+
   const [geoLoading, setGeoLoading] = useStateS(false);
   const detectHome = () => {
     if (!navigator.geolocation || !onLocationSelect) return;
@@ -1718,8 +1728,8 @@ function Dashboard({ tweaks, activeLocation, onLocationSelect, setUserGeoLoc, pr
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 11, color: 'var(--muted)', letterSpacing: 0.5, lineHeight: 1.4 }}>
-            MON 18 MAY<br/>
-            <span style={{ color: 'var(--ink)' }}>09:14 NZST</span>
+            {_clockDate}<br/>
+            <span style={{ color: 'var(--ink)' }}>{_clockTime} {_clockTZ}</span>
           </div>
         </div>
 
