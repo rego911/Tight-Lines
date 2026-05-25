@@ -72,72 +72,99 @@
 </style>
 <script>
 (function(){
-  function drawFish(size) {
+  // Draws the hook icon (matches icon-master.svg) onto a canvas of any size.
+  // Coordinates are in the 1024-unit space of the master SVG; k scales them down.
+  function drawHook(size) {
     var c = document.createElement('canvas');
     c.width = c.height = size;
-    var x = c.getContext('2d');
-    var s = size;
-    // Background
-    x.fillStyle = '#07091A';
-    x.fillRect(0,0,s,s);
-    // Radial glow
-    var g = x.createRadialGradient(s*.56,s*.5,0,s*.56,s*.5,s*.52);
-    g.addColorStop(0,'rgba(0,201,167,0.28)');
-    g.addColorStop(1,'rgba(0,201,167,0)');
-    x.fillStyle = g; x.fillRect(0,0,s,s);
-    var cx=s*.54, cy=s*.5, rx=s*.29, ry=s*.175;
-    // Tail
-    x.beginPath();
-    x.moveTo(cx-rx, cy);
-    x.lineTo(cx-rx-s*.19, cy-s*.19);
-    x.lineTo(cx-rx-s*.05, cy);
-    x.lineTo(cx-rx-s*.19, cy+s*.19);
-    x.closePath();
-    x.fillStyle='#00C9A7'; x.fill();
-    // Body
-    x.beginPath();
-    x.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-    x.fillStyle='#00C9A7'; x.fill();
-    // Dorsal fin
-    x.beginPath();
-    x.moveTo(cx-rx*.3,cy-ry);
-    x.quadraticCurveTo(cx+rx*.1,cy-ry-s*.13,cx+rx*.35,cy-ry+s*.01);
-    x.lineTo(cx+rx*.35,cy-ry);
-    x.closePath();
-    x.fillStyle='rgba(0,180,150,0.85)'; x.fill();
-    // Eye white
-    x.beginPath();
-    x.arc(cx+rx*.55,cy-ry*.18,s*.052,0,Math.PI*2);
-    x.fillStyle='#fff'; x.fill();
-    // Eye pupil
-    x.beginPath();
-    x.arc(cx+rx*.55+s*.012,cy-ry*.18,s*.03,0,Math.PI*2);
-    x.fillStyle='#07091A'; x.fill();
-    // Eye shine
-    x.beginPath();
-    x.arc(cx+rx*.55+s*.005,cy-ry*.18-s*.018,s*.012,0,Math.PI*2);
-    x.fillStyle='rgba(255,255,255,0.9)'; x.fill();
-    // Mouth
-    x.beginPath();
-    x.arc(cx+rx+s*.01,cy+s*.03,s*.035,-.4,Math.PI*.55);
-    x.strokeStyle='#07091A'; x.lineWidth=s*.025; x.stroke();
+    var ctx = c.getContext('2d');
+    var s = size, k = s / 1024;
+
+    // Rounded square background (same proportions as iOS icon rx=230/1024≈22.5%)
+    var r = s * 0.225;
+    ctx.beginPath();
+    ctx.moveTo(r, 0); ctx.lineTo(s - r, 0);
+    ctx.quadraticCurveTo(s, 0, s, r);
+    ctx.lineTo(s, s - r); ctx.quadraticCurveTo(s, s, s - r, s);
+    ctx.lineTo(r, s); ctx.quadraticCurveTo(0, s, 0, s - r);
+    ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.fillStyle = '#070C18'; ctx.fill();
+
+    // Teal radial glow centred on hook
+    var glow = ctx.createRadialGradient(s * 0.5, s * 0.44, 0, s * 0.5, s * 0.44, s * 0.38);
+    glow.addColorStop(0, 'rgba(0,201,167,0.18)');
+    glow.addColorStop(1, 'rgba(0,201,167,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, s, s);
+
+    ctx.strokeStyle = '#00C9A7';
+    ctx.lineCap    = 'round';
+    ctx.lineJoin   = 'round';
+
+    // Fishing line — faint diagonal from top-right down to eye
+    ctx.save();
+    ctx.globalAlpha = 0.38;
+    ctx.lineWidth = 14 * k;
+    ctx.beginPath(); ctx.moveTo(518 * k, 82 * k); ctx.lineTo(424 * k, 186 * k);
+    ctx.stroke();
+    ctx.restore();
+
+    // Hook eye (ring)
+    ctx.lineWidth = 26 * k;
+    ctx.beginPath();
+    ctx.arc(424 * k, 228 * k, 42 * k, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Shaft → bend → shank (the main hook body)
+    ctx.lineWidth = 52 * k;
+    ctx.beginPath();
+    ctx.moveTo(424 * k, 270 * k);
+    ctx.lineTo(424 * k, 686 * k);
+    ctx.bezierCurveTo(424 * k, 824 * k, 624 * k, 824 * k, 624 * k, 686 * k);
+    ctx.lineTo(624 * k, 472 * k);
+    ctx.stroke();
+
+    // Barb
+    ctx.lineWidth = 38 * k;
+    ctx.beginPath();
+    ctx.moveTo(624 * k, 554 * k);
+    ctx.lineTo(556 * k, 626 * k);
+    ctx.stroke();
+
     return c.toDataURL('image/png');
   }
-  // Apple touch icon (180×180)
-  var big = drawFish(180);
+
+  var i192 = drawHook(192);
+  var i180 = drawHook(180);
+  var i32  = drawHook(32);
+  var i16  = drawHook(16);
+
+  // Apple touch icon (used when added to home screen on iOS)
   var al = document.createElement('link');
-  al.rel='apple-touch-icon'; al.sizes='180x180'; al.href=big;
+  al.rel = 'apple-touch-icon'; al.sizes = '180x180'; al.href = i180;
   document.head.appendChild(al);
-  // Favicon 32
-  var sm = drawFish(32);
+
+  // Browser favicons
   var fl = document.createElement('link');
-  fl.rel='icon'; fl.type='image/png'; fl.sizes='32x32'; fl.href=sm;
+  fl.rel = 'icon'; fl.type = 'image/png'; fl.sizes = '32x32'; fl.href = i32;
   document.head.appendChild(fl);
-  // Favicon 16
-  var ti = drawFish(16);
   var tl = document.createElement('link');
-  tl.rel='icon'; tl.type='image/png'; tl.sizes='16x16'; tl.href=ti;
+  tl.rel = 'icon'; tl.type = 'image/png'; tl.sizes = '16x16'; tl.href = i16;
   document.head.appendChild(tl);
+
+  // Update PWA manifest with the real icon so "Add to Home Screen" uses it
+  var ml = document.querySelector('link[rel="manifest"]');
+  if (ml) {
+    var m = {
+      name: 'Tight Lines', short_name: 'TightLines',
+      description: 'NZ fishing conditions at a glance',
+      start_url: '.', display: 'standalone',
+      background_color: '#0A0F1E', theme_color: '#0A0F1E',
+      icons: [{ src: i192, sizes: '192x192', type: 'image/png' }],
+    };
+    var mb = new Blob([JSON.stringify(m)], { type: 'application/json' });
+    ml.href = URL.createObjectURL(mb);
+  }
 })();
 </script>
 </head>
