@@ -34,6 +34,11 @@
   @keyframes tl-stagger { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
   @keyframes tl-screen-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   @keyframes tl-data-load { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+  @keyframes tl-drawpath  { from{clip-path:inset(0 100% 0 0)} to{clip-path:inset(0 0% 0 0)} }
+  @keyframes tl-float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  @keyframes tl-value-in  { 0%{opacity:0;transform:scale(.65) translateY(6px)}
+                             65%{transform:scale(1.07) translateY(-1px)}
+                             100%{opacity:1;transform:scale(1) translateY(0)} }
   @keyframes tl-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.6)} }
   @keyframes tl-pop { from{transform:translateX(-50%) scaleX(0);opacity:0} to{transform:translateX(-50%) scaleX(1);opacity:1} }
   @keyframes tl-rain { 0%{transform:translate(0,-4px);opacity:0} 30%{opacity:1} 100%{transform:translate(-1px,3px);opacity:0} }
@@ -1259,7 +1264,8 @@ function TideChart({ data, events, height = 130, nowIdx = 16, showLabels = true 
         <g className="tl-tide-undulate">
           <path d={fillD} fill="url(#tl-tide-fill)" />
           <path d={pathD} fill="none" stroke="var(--teal)" strokeWidth="2"
-                style={{ filter: 'drop-shadow(0 0 6px rgba(0,201,167,0.35))' }} />
+                style={{ filter: 'drop-shadow(0 0 6px rgba(0,201,167,0.35))',
+                         animation: 'tl-drawpath 1.4s cubic-bezier(.4,0,.2,1) .05s both' }} />
         </g>
         {/* events */}
         {events && events.map((e, i) => {
@@ -1267,9 +1273,12 @@ function TideChart({ data, events, height = 130, nowIdx = 16, showLabels = true 
           const idx = Math.round((hour / 24) * (data.length - 1));
           const ex = xFor(idx), ey = yFor(e.height);
           return (
-            <g key={i}>
-              <circle cx={ex} cy={ey} r="3" fill="var(--bg)" stroke="var(--teal)" strokeWidth="1.5" />
-              {showLabels && <text x={ex} y={ey - 10} fontSize="9" fill="var(--muted)" textAnchor="middle"
+            <g key={i} style={{ animation: `tl-stagger .45s cubic-bezier(.21,.61,.35,1) ${0.9 + i * 0.14}s both` }}>
+              <circle cx={ex} cy={ey} r="5" fill="var(--bg)" stroke="rgba(0,201,167,0.3)" strokeWidth="1" />
+              <circle cx={ex} cy={ey} r="3" fill="var(--bg)" stroke="var(--teal)" strokeWidth="2"
+                      style={{ filter: 'drop-shadow(0 0 4px rgba(0,201,167,0.7))' }} />
+              <circle cx={ex} cy={ey} r="1.2" fill="var(--teal)" />
+              {showLabels && <text x={ex} y={ey - 14} fontSize="9" fill="var(--muted)" textAnchor="middle"
                     fontFamily="Inter, system-ui" letterSpacing="0.4">{e.label.toUpperCase()} {e.time}</text>}
             </g>
           );
@@ -1537,14 +1546,28 @@ function generateLocationData(loc) {
   const tl1 = +(0.08 + h(26) * 0.25).toFixed(2);
   const th2 = +(1.4 + h(27) * 0.8).toFixed(2);
   const tl2 = +(0.1 + h(28) * 0.25).toFixed(2);
-  const tideEvents = [
-    { time: fmt(t_h1.hh, t_h1.mm), label: 'High', height: th1 },
-    { time: fmt(t_l1.hh, t_l1.mm), label: 'Low',  height: tl1 },
-    { time: fmt(t_h2.hh, t_h2.mm), label: 'High', height: th2 },
-    { time: fmt(t_l2.hh, t_l2.mm), label: 'Low',  height: tl2 },
-  ].sort((a, b) => a.time.localeCompare(b.time));
-  const tideHeight = +(0.3 + h(15) * 1.7).toFixed(1);
-  const tideState  = h(29) > 0.5 ? 'Rising' : 'Falling';
+  // Tide curve — computed here so tideEvents are derived from its actual peaks/troughs
+  const tph = h(29) * Math.PI * 2;
+  const tide = Array.from({ length: 48 }, (_, i) => {
+    const t = i / 48 * 24;
+    return { t, hour: t, height: +(1.0 + 0.95 * Math.sin((t / 12.42) * Math.PI * 2 + tph)).toFixed(2) };
+  });
+  // Scan for local maxima/minima — markers will sit exactly on the curve
+  const _tideMean = tide.reduce((a, b) => a + b.height, 0) / tide.length;
+  const tideEvents = [];
+  for (let _ti = 1; _ti < tide.length - 1; _ti++) {
+    const _p = tide[_ti-1].height, _c = tide[_ti].height, _n = tide[_ti+1].height;
+    const _hh = Math.floor(tide[_ti].t), _mm = Math.round((tide[_ti].t - _hh) * 60);
+    if (_c >= _p && _c >= _n && _c > _tideMean)
+      tideEvents.push({ time: fmt(_hh, _mm), label: 'High', height: tide[_ti].height });
+    else if (_c <= _p && _c <= _n && _c < _tideMean)
+      tideEvents.push({ time: fmt(_hh, _mm), label: 'Low',  height: tide[_ti].height });
+  }
+  tideEvents.sort((a, b) => a.time.localeCompare(b.time));
+  // State and height from curve at current hour
+  const _nowTi   = Math.min(47, Math.round(_nowH * 2));
+  const tideHeight = tide[_nowTi].height;
+  const tideState  = _nowTi < 47 && tide[_nowTi + 1].height > tide[_nowTi].height ? 'Rising' : 'Falling';
   const nextTideEvt = tideState === 'Rising' ? tideEvents.find(e => e.label === 'High') : tideEvents.find(e => e.label === 'Low');
   const nextTide   = nextTideEvt ? `${nextTideEvt.label} ${nextTideEvt.time}` : 'High 14:32';
 
@@ -1595,14 +1618,6 @@ function generateLocationData(loc) {
       peakWindow: ds > 60 ? peaks[Math.floor(h(85 + i) * peaks.length)] : '—',
       cond: conds[Math.floor(h(88 + i) * conds.length)],
     };
-  });
-
-  // Tide curve
-  const tph = h(29) * Math.PI * 2;
-  const tide = Array.from({ length: 48 }, (_, i) => {
-    const t = i / 48 * 24;
-    const ht = 1.0 + 0.95 * Math.sin((t / 12.42) * Math.PI * 2 + tph);
-    return { t, hour: t, height: +(ht.toFixed(2)) };
   });
 
   // Species with varied scores
@@ -2102,7 +2117,8 @@ function Dashboard({ tweaks, activeLocation, onLocationSelect, setUserGeoLoc, pr
             <SectionHeader title="What's Working" hint="Conditions-based" inset />
             <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:8 }}>
               {baits.map((b,i) => (
-                <TLGlass key={i} intensity={intensity} padding={0} style={{ overflow:'hidden' }}>
+                <TLGlass key={i} intensity={intensity} padding={0}
+                         style={{ overflow:'hidden', animation: `tl-stagger .5s cubic-bezier(.21,.61,.35,1) ${i * 0.1}s both` }}>
                   <div style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px' }}>
                     <div style={{ width:40, height:40, borderRadius:10, background:`${b.color}18`, border:`1px solid ${b.color}44`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       <svg width='20' height='20' viewBox='0 0 24 24' fill='none'><path d='M2 12C2 12 7 5 12 5C17 5 22 12 22 12C22 12 17 19 12 19C7 19 2 12 2 12Z' stroke='currentColor' strokeWidth='1.5'/><path d='M4 8C6 6 9 4 13 5L22 12L13 19C9 20 6 18 4 16' fill='currentColor' opacity='0.15'/><circle cx='12' cy='12' r='3' stroke='currentColor' strokeWidth='1.5'/></svg>
@@ -2202,7 +2218,8 @@ function StatTilesGrid({ n, intensity, showMotion, prefs }) {
 function StatTile({ icon, label, value, unit, sub, tone = 'default', intensity, idx, pressure, trend, delta }) {
   const toneColor = tone === 'teal' ? 'var(--teal)' : tone === 'amber' ? 'var(--amber)' : 'var(--ink)';
   return (
-    <TLGlass intensity={intensity} padding={10} style={{ minHeight: 88 }}>
+    <TLGlass intensity={intensity} padding={10}
+             style={{ minHeight: 88, animation: `tl-stagger .55s cubic-bezier(.21,.61,.35,1) ${idx * 0.07}s both` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <span style={{ fontSize: 9, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--muted)', fontWeight: 600 }}>
           {label}
@@ -2249,11 +2266,13 @@ function HourCard({ h, idx, scroll, intensity }) {
   const parallax = -offset * 0.05;
   const depth = Math.max(0.7, 1 - Math.abs(offset) / 600);
   const tone = h.score >= 75 ? 'var(--teal)' : h.score >= 55 ? '#7BD4F0' : 'var(--muted)';
+  const floatStyle = h.score >= 78 ? { animation: 'tl-float 2.6s ease-in-out infinite' } : {};
   return (
     <div style={{
       transform: `translateX(${parallax}px) translateZ(0) scale(${depth})`,
       transition: 'transform 80ms linear',
       opacity: depth,
+      animation: `tl-stagger .45s cubic-bezier(.21,.61,.35,1) ${Math.min(idx * 0.04, 0.6)}s both`,
     }}>
       <TLGlass intensity={intensity} padding={10} style={{
         width: cardW, textAlign: 'center', position: 'relative',
@@ -2377,7 +2396,7 @@ function Conditions({ tweaks, activeLocation, prefs }) {
               <SubTitle icon="tide">Tides</SubTitle>
               <span style={{ fontSize: 11, color: 'var(--muted)' }}>{new Date().toLocaleDateString('en-NZ',{weekday:'short',day:'numeric',month:'short'})} · LINZ</span>
             </div>
-            <TideChart data={D.tide} events={D.tideEvents} nowIdx={18} />
+            <TideChart data={D.tide} events={D.tideEvents} nowIdx={Math.min(47, Math.round(new Date().getHours() * 2))} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 4, marginTop: 12 }}>
               {D.tideEvents.map(e => (
                 <div key={e.time} style={{ textAlign: 'center', padding: 6, background: 'rgba(255,255,255,0.03)', borderRadius: 8 }}>
@@ -2405,10 +2424,17 @@ function Conditions({ tweaks, activeLocation, prefs }) {
               })()}
               <div style={{ marginTop: 14 }}>
                 {/* swell amp meter */}
-                <svg width="100%" height="42" viewBox="0 0 100 42" preserveAspectRatio="none">
-                  <path d="M0 28 Q 12 18, 25 28 T 50 28 T 75 28 T 100 28 L 100 42 L 0 42 Z" fill="rgba(0,201,167,0.18)"/>
-                  <path d="M0 28 Q 12 18, 25 28 T 50 28 T 75 28 T 100 28" fill="none" stroke="var(--teal)" strokeWidth="1.5"
-                        style={{ filter: 'drop-shadow(0 0 4px var(--teal))' }}/>
+                <svg width="100%" height="50" viewBox="0 0 100 50" preserveAspectRatio="none"
+                     style={{ overflow:'visible' }}>
+                  <path d="M0 30 Q 12 20, 25 30 T 50 30 T 75 30 T 100 30 L 100 50 L 0 50 Z"
+                        fill="rgba(0,201,167,0.18)" className="tl-tide-undulate"
+                        style={{ animationDuration:'3.6s', animationDelay:'.4s' }}/>
+                  <path d="M0 30 Q 12 20, 25 30 T 50 30 T 75 30 T 100 30"
+                        fill="none" stroke="var(--teal)" strokeWidth="1.5"
+                        className="tl-tide-undulate"
+                        style={{ filter:'drop-shadow(0 0 5px var(--teal))',
+                                 animationDuration:'3.6s',
+                                 animation:'tl-tide-undulate 3.6s ease-in-out infinite, tl-drawpath .9s ease .2s both' }}/>
                 </svg>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 9, color: 'var(--muted)' }}>
                   <span>Wind wave 0.4m</span><span>Primary 1.2m</span>
@@ -2514,8 +2540,10 @@ function BigMetric({ value, unit, label, style = {} }) {
   return (
     <div style={style}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-        <span style={{ fontFamily: '"Inter Tight",Inter', fontSize: 36, fontWeight: 700, letterSpacing: -1.5,
-                       fontVariantNumeric: 'tabular-nums' }}>{value}</span>
+        <span key={String(value)}
+              style={{ fontFamily: '"Inter Tight",Inter', fontSize: 36, fontWeight: 700, letterSpacing: -1.5,
+                       fontVariantNumeric: 'tabular-nums',
+                       animation: 'tl-value-in .5s cubic-bezier(.34,1.56,.64,1) both' }}>{value}</span>
         <span style={{ color: 'var(--muted)', fontSize: 12 }}>{unit}</span>
       </div>
       {label && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: -2 }}>{label}</div>}
